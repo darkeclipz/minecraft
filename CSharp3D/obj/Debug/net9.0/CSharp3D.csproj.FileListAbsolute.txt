@@ -34,3 +34,4 @@ C:\Users\Darky\Documents\Repos\CSharp3D\CSharp3D\obj\Debug\net9.0\refint\CSharp3
 C:\Users\Darky\Documents\Repos\CSharp3D\CSharp3D\obj\Debug\net9.0\CSharp3D.pdb
 C:\Users\Darky\Documents\Repos\CSharp3D\CSharp3D\obj\Debug\net9.0\CSharp3D.genruntimeconfig.cache
 C:\Users\Darky\Documents\Repos\CSharp3D\CSharp3D\obj\Debug\net9.0\ref\CSharp3D.dll
+C:\Users\Darky\Documents\Repos\CSharp3D\CSharp3D\bin\Debug\net9.0\Textures\tile_atlas.png

@@ -1,4 +1,5 @@
 ﻿using OpenTK.Graphics.OpenGLES2;
+using OpenTK.Mathematics;
 
 namespace CSharp3D;
 
@@ -79,6 +80,12 @@ public class Shader : IDisposable
     public int GetAttributeLocation(string attribute)
     {
         return GL.GetAttribLocation(_handle, attribute);
+    }
+
+    public void SetMatrix4(string name, ref Matrix4 matrix)
+    {
+        var loc = GetUniformLocation(name);
+        GL.UniformMatrix4f(loc, 1, true, ref matrix);
     }
 
     protected virtual void Dispose(bool disposing)
