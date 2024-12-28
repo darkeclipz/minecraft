@@ -8,7 +8,7 @@ using OpenTK.Windowing.GraphicsLibraryFramework;
 
 // Implement ImGuiNet too!
 
-using var game = new Game(800, 600, "Hello World!");
+using var game = new Game(1920, 1080, "Hello World!");
 game.Run();
 
 public class Game : GameWindow
@@ -34,8 +34,12 @@ public class Game : GameWindow
     private Vector2 _lastMousePosition = Vector2.Zero;
 
     private bool _firstMove = true;
+
+    private Chunk _chunk;
+
+    private World _world;
     
-    private readonly float[] _vertices =
+    private float[] _vertices =
     [
         -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
@@ -107,8 +111,13 @@ public class Game : GameWindow
         base.OnRenderFrame(e);
         GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
         _shader.Use();
-        GL.BindVertexArray(_vertexArrayObject);
-        GL.DrawArrays(PrimitiveType.Triangles, 0, 36);
+        
+        foreach (var chunk in _world.Chunks)
+        {
+            GL.BindVertexArray(chunk.Mesh.VertexArrayObject);
+            GL.DrawArrays(PrimitiveType.Triangles, 0, chunk.Mesh.Vertices.Length / 5);    
+        }
+        
         // GL.DrawElements(PrimitiveType.Triangles, _indices.Length, DrawElementsType.UnsignedInt, 0);
         
         SwapBuffers();
@@ -134,34 +143,41 @@ public class Game : GameWindow
             Close();
         }
 
+        var sprint = 1f;
+
+        if (input.IsKeyDown(Keys.LeftShift))
+        {
+            sprint = 2f;
+        }
+
         if (input.IsKeyDown(Keys.W))
         {
-            _camera.Position += _camera.Front * _camera.Speed * dt;
+            _camera.Position += _camera.Front * _camera.Speed * dt * sprint;
         }
 
         if (input.IsKeyDown(Keys.S))
         {
-            _camera.Position -= _camera.Front * _camera.Speed * dt;
+            _camera.Position -= _camera.Front * _camera.Speed * dt * sprint;
         }
 
         if (input.IsKeyDown(Keys.A))
         {
-            _camera.Position -= Vector3.Normalize(Vector3.Cross(_camera.Front, _camera.Up)) * _camera.Speed * dt;
+            _camera.Position -= Vector3.Normalize(Vector3.Cross(_camera.Front, _camera.Up)) * _camera.Speed * dt * sprint;
         }
         
         if (input.IsKeyDown(Keys.D))
         {
-            _camera.Position += Vector3.Normalize(Vector3.Cross(_camera.Front, _camera.Up)) * _camera.Speed * dt;
+            _camera.Position += Vector3.Normalize(Vector3.Cross(_camera.Front, _camera.Up)) * _camera.Speed * dt * sprint;
         }
 
         if (input.IsKeyDown(Keys.Space))
         {
-            _camera.Position += _camera.Up * _camera.Speed * dt;
+            _camera.Position += _camera.Up * _camera.Speed * dt * sprint;
         }
 
-        if (input.IsKeyDown(Keys.LeftShift))
+        if (input.IsKeyDown(Keys.LeftControl))
         {
-            _camera.Position -= _camera.Up * _camera.Speed * dt;
+            _camera.Position -= _camera.Up * _camera.Speed * dt * sprint;
         }
 
         if (input.IsKeyReleased(Keys.LeftAlt))
@@ -191,14 +207,15 @@ public class Game : GameWindow
 
         // Update the model.
         var time = (float)_timer.Elapsed.TotalSeconds;
-        var rotX = Matrix4.CreateRotationX(MathHelper.DegreesToRadians(-55.0f) + 0.5f * time);
-        var rotZ = Matrix4.CreateRotationZ(time);
+        var rotX = Matrix4.CreateRotationX(MathHelper.DegreesToRadians(0));
+        var rotZ = Matrix4.CreateRotationZ(0);
         var rotation = rotX * rotZ;
         
         _shader.SetMatrix4("model", ref rotation);
         
         var blockIdLoc = _shader.GetUniformLocation("blockId");
-        GL.Uniform1i(blockIdLoc, (int)(time % 5.0));
+        const int numberOfBlocks = 11;
+        GL.Uniform1i(blockIdLoc, 1);
         
         // Update block.
         
@@ -224,18 +241,23 @@ public class Game : GameWindow
         Console.WriteLine("Initializing OpenGL.");
         
         GL.ClearColor(135f / 255f, 206f / 255f, 245f / 255f, 1f);
-
-        _vertexArrayObject = GL.GenVertexArray();
-        GL.BindVertexArray(_vertexArrayObject);
-
-        _vertexBufferObject = GL.GenBuffer();
-        GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBufferObject);
-        GL.BufferData(BufferTarget.ArrayBuffer, _vertices.Length * sizeof(float), _vertices, BufferUsage.StaticDraw);
-
-        _elementBufferObject = GL.GenBuffer();
-        GL.BindBuffer(BufferTarget.ElementArrayBuffer, _elementBufferObject);
-        GL.BufferData(BufferTarget.ElementArrayBuffer, _indices.Length * sizeof(uint), _indices, BufferUsage.StaticDraw);
         
+        Console.WriteLine("Generating world...");
+        _world = new World(renderDistance: 3);
+
+        // _vertices = _chunk.Mesh.Vertices;
+
+        // _vertexArrayObject = GL.GenVertexArray();
+        // GL.BindVertexArray(_vertexArrayObject);
+        //
+        // _vertexBufferObject = GL.GenBuffer();
+        // GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBufferObject);
+        // GL.BufferData(BufferTarget.ArrayBuffer, _vertices.Length * sizeof(float), _vertices, BufferUsage.StaticDraw);
+        //
+        // _elementBufferObject = GL.GenBuffer();
+        // GL.BindBuffer(BufferTarget.ElementArrayBuffer, _elementBufferObject);
+        // GL.BufferData(BufferTarget.ElementArrayBuffer, _indices.Length * sizeof(uint), _indices, BufferUsage.StaticDraw);
+        //
         _shader = new Shader("Shaders/shader.vert", "Shaders/shader.frag");
         _shader.Use();
         
@@ -253,7 +275,10 @@ public class Game : GameWindow
         _texture = new Texture("Textures/tile_atlas.png");
         _texture.Use(TextureUnit.Texture0);
 
-        _camera = new Camera();
+        _camera = new Camera
+        {
+            Position = new Vector3(0, 65, 0)
+        };
 
         Matrix4 model = Matrix4.CreateRotationX(MathHelper.DegreesToRadians(-55.0f));
         Matrix4 view = _camera.GetViewMatrix();
@@ -264,6 +289,10 @@ public class Game : GameWindow
         _shader.SetMatrix4("projection", ref projection);
 
         GL.Enable(EnableCap.DepthTest);
+        
+        GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+        
+        GL.Enable(EnableCap.Blend);
 
         CursorState = CursorState.Grabbed;
     }

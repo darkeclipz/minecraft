@@ -13,5 +13,4 @@ void main()
     vec2 texOffset = vec2(blockId, (16.0 - 1.0));
 
     FragColor = texture(texture0, (texCoord + texOffset) / texSize);
-    // FragColor = vec4(texCoord, 0.0, 1.0);
 }

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CSharp3D")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fc98c74aea3fb2d80c5d154a448412f02a8d6c35")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d4747882a0a5b13f9e211d7c72488591ed934fb4")]
 [assembly: System.Reflection.AssemblyProductAttribute("CSharp3D")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CSharp3D")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
