@@ -22,4 +22,15 @@ public class Chunk
     {
         Mesh = Mesh.From(this, world);
     }
+    
+    public bool IsSolid(int x, int y, int z)
+    {
+        if (x < 0 || x > Dimensions.X - 1) return false;
+        if (y < 0 || y > Dimensions.Y - 1) return false;
+        if (z < 0 || z > Dimensions.Z - 1) return false;
+        
+        var block = Blocks[x, y, z];
+
+        return block != BlockType.Air;
+    }
 }

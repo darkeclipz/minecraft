@@ -31,7 +31,7 @@ public class Mesh
         
         List<float> vertices = [];
 
-        for (var y = Chunk.Dimensions.Y - 2; y >= 0; y--) // Assuming we cannot do anything with the top layer.
+        for (var y = Chunk.Dimensions.Y - 1; y >= 0; y--)
         {
             for (var x = 0; x < Chunk.Dimensions.X; x++)
             {
@@ -44,52 +44,76 @@ public class Mesh
                         var worldZ = chunk.Position.Z + z;
                         
                         // Top
-                        vertices.AddRange([-0.5f + worldX,  0.5f + worldY, -0.5f + worldZ,  0.0f, 1.0f]);
-                        vertices.AddRange([0.5f + worldX,  0.5f + worldY, -0.5f + worldZ,  1.0f, 1.0f]);
-                        vertices.AddRange([0.5f + worldX,  0.5f + worldY,  0.5f + worldZ,  1.0f, 0.0f]);
-                        vertices.AddRange([0.5f + worldX,  0.5f + worldY,  0.5f + worldZ,  1.0f, 0.0f]);
-                        vertices.AddRange([-0.5f + worldX,  0.5f + worldY,  0.5f + worldZ,  0.0f, 0.0f]);
-                        vertices.AddRange([-0.5f + worldX,  0.5f + worldY, -0.5f + worldZ,  0.0f, 1.0f]);
+                        if (!chunk.IsSolid(x, y + 1, z))
+                        {
+                            var blockType = (int)OverrideBlockTypeForFace(chunk.Blocks[x, y, z], Side.Top);
+                            vertices.AddRange([-0.5f + worldX,  0.5f + worldY, -0.5f + worldZ, 0f, 1f, 0f,  TextureX(0.0f, blockType), TextureY(1.0f, blockType)]);
+                            vertices.AddRange([ 0.5f + worldX,  0.5f + worldY, -0.5f + worldZ, 0f, 1f, 0f,  TextureX(1.0f, blockType), TextureY(1.0f, blockType)]);
+                            vertices.AddRange([ 0.5f + worldX,  0.5f + worldY,  0.5f + worldZ, 0f, 1f, 0f,  TextureX(1.0f, blockType), TextureY(0.0f, blockType)]);
+                            vertices.AddRange([ 0.5f + worldX,  0.5f + worldY,  0.5f + worldZ, 0f, 1f, 0f,  TextureX(1.0f, blockType), TextureY(0.0f, blockType)]);
+                            vertices.AddRange([-0.5f + worldX,  0.5f + worldY,  0.5f + worldZ, 0f, 1f, 0f,  TextureX(0.0f, blockType), TextureY(0.0f, blockType)]);
+                            vertices.AddRange([-0.5f + worldX,  0.5f + worldY, -0.5f + worldZ, 0f, 1f, 0f,  TextureX(0.0f, blockType), TextureY(1.0f, blockType)]);
+                        }
+
+                        // Bottom
+                        if (!chunk.IsSolid(x, y - 1, z))
+                        {
+                            var blockType = (int)OverrideBlockTypeForFace(chunk.Blocks[x, y, z], Side.Bottom);
+                            vertices.AddRange([-0.5f + worldX, -0.5f + worldY, -0.5f + worldZ, 0f, -1f, 0f,  TextureX(0.0f, blockType), TextureY(1.0f, blockType)]);
+                            vertices.AddRange([ 0.5f + worldX, -0.5f + worldY, -0.5f + worldZ, 0f, -1f, 0f,  TextureX(1.0f, blockType), TextureY(1.0f, blockType)]);
+                            vertices.AddRange([ 0.5f + worldX, -0.5f + worldY,  0.5f + worldZ, 0f, -1f, 0f,  TextureX(1.0f, blockType), TextureY(0.0f, blockType)]);
+                            vertices.AddRange([ 0.5f + worldX, -0.5f + worldY,  0.5f + worldZ, 0f, -1f, 0f,  TextureX(1.0f, blockType), TextureY(0.0f, blockType)]);
+                            vertices.AddRange([-0.5f + worldX, -0.5f + worldY,  0.5f + worldZ, 0f, -1f, 0f,  TextureX(0.0f, blockType), TextureY(0.0f, blockType)]);
+                            vertices.AddRange([-0.5f + worldX, -0.5f + worldY, -0.5f + worldZ, 0f, -1f, 0f,  TextureX(0.0f, blockType), TextureY(1.0f, blockType)]);
+                        }
                         
                         // Back
-                        vertices.AddRange([-0.5f + worldX, -0.5f + worldY, -0.5f + worldZ,  0.0f, 0.0f]);
-                        vertices.AddRange([0.5f + worldX, -0.5f + worldY, -0.5f + worldZ,  1.0f, 0.0f]);
-                        vertices.AddRange([0.5f + worldX,  0.5f + worldY, -0.5f + worldZ,  1.0f, 1.0f]);
-                        vertices.AddRange([0.5f + worldX,  0.5f + worldY, -0.5f + worldZ,  1.0f, 1.0f]);
-                        vertices.AddRange([-0.5f + worldX,  0.5f + worldY, -0.5f + worldZ,  0.0f, 1.0f]);
-                        vertices.AddRange([-0.5f + worldX, -0.5f + worldY, -0.5f + worldZ,  0.0f, 0.0f]);
+                        if (!chunk.IsSolid(x, y, z - 1))
+                        {
+                            var blockType = (int)OverrideBlockTypeForFace(chunk.Blocks[x, y, z], Side.Back);
+                            vertices.AddRange([-0.5f + worldX, -0.5f + worldY, -0.5f + worldZ, 0f, 0f, -1f,  TextureX(0.0f, blockType), TextureY(0.0f, blockType)]);
+                            vertices.AddRange([ 0.5f + worldX, -0.5f + worldY, -0.5f + worldZ, 0f, 0f, -1f,  TextureX(1.0f, blockType), TextureY(0.0f, blockType)]);
+                            vertices.AddRange([ 0.5f + worldX,  0.5f + worldY, -0.5f + worldZ, 0f, 0f, -1f,  TextureX(1.0f, blockType), TextureY(1.0f, blockType)]);
+                            vertices.AddRange([ 0.5f + worldX,  0.5f + worldY, -0.5f + worldZ, 0f, 0f, -1f,  TextureX(1.0f, blockType), TextureY(1.0f, blockType)]);
+                            vertices.AddRange([-0.5f + worldX,  0.5f + worldY, -0.5f + worldZ, 0f, 0f, -1f,  TextureX(0.0f, blockType), TextureY(1.0f, blockType)]);
+                            vertices.AddRange([-0.5f + worldX, -0.5f + worldY, -0.5f + worldZ, 0f, 0f, -1f,  TextureX(0.0f, blockType), TextureY(0.0f, blockType)]);    
+                        }
                         
                         // Front
-                        vertices.AddRange([-0.5f + worldX, -0.5f + worldY,  0.5f + worldZ,  0.0f, 0.0f]);
-                        vertices.AddRange([0.5f + worldX, -0.5f + worldY,  0.5f + worldZ,  1.0f, 0.0f]);
-                        vertices.AddRange([0.5f + worldX,  0.5f + worldY,  0.5f + worldZ,  1.0f, 1.0f]);
-                        vertices.AddRange([0.5f + worldX,  0.5f + worldY,  0.5f + worldZ,  1.0f, 1.0f]);
-                        vertices.AddRange([-0.5f + worldX,  0.5f + worldY,  0.5f + worldZ,  0.0f, 1.0f]);
-                        vertices.AddRange([-0.5f + worldX, -0.5f + worldY,  0.5f + worldZ,  0.0f, 0.0f]);
+                        if (!chunk.IsSolid(x, y, z + 1))
+                        {
+                            var blockType = (int)OverrideBlockTypeForFace(chunk.Blocks[x, y, z], Side.Front);
+                            vertices.AddRange([-0.5f + worldX, -0.5f + worldY,  0.5f + worldZ, 0f, 0f, 1f,  TextureX(0.0f, blockType), TextureY(0.0f, blockType)]);
+                            vertices.AddRange([ 0.5f + worldX, -0.5f + worldY,  0.5f + worldZ, 0f, 0f, 1f,  TextureX(1.0f, blockType), TextureY(0.0f, blockType)]);
+                            vertices.AddRange([ 0.5f + worldX,  0.5f + worldY,  0.5f + worldZ, 0f, 0f, 1f,  TextureX(1.0f, blockType), TextureY(1.0f, blockType)]);
+                            vertices.AddRange([ 0.5f + worldX,  0.5f + worldY,  0.5f + worldZ, 0f, 0f, 1f,  TextureX(1.0f, blockType), TextureY(1.0f, blockType)]);
+                            vertices.AddRange([-0.5f + worldX,  0.5f + worldY,  0.5f + worldZ, 0f, 0f, 1f,  TextureX(0.0f, blockType), TextureY(1.0f, blockType)]);
+                            vertices.AddRange([-0.5f + worldX, -0.5f + worldY,  0.5f + worldZ, 0f, 0f, 1f,  TextureX(0.0f, blockType), TextureY(0.0f, blockType)]);
+                        }
                         
                         // Left
-                        vertices.AddRange([-0.5f + worldX,  0.5f + worldY,  0.5f + worldZ,  1.0f, 0.0f]);
-                        vertices.AddRange([-0.5f + worldX,  0.5f + worldY, -0.5f + worldZ,  1.0f, 1.0f]);
-                        vertices.AddRange([-0.5f + worldX, -0.5f + worldY, -0.5f + worldZ,  0.0f, 1.0f]);
-                        vertices.AddRange([-0.5f + worldX, -0.5f + worldY, -0.5f + worldZ,  0.0f, 1.0f]);
-                        vertices.AddRange([-0.5f + worldX, -0.5f + worldY,  0.5f + worldZ,  0.0f, 0.0f]);
-                        vertices.AddRange([-0.5f + worldX,  0.5f + worldY,  0.5f + worldZ,  1.0f, 0.0f]);
+                        if (!chunk.IsSolid(x - 1, y, z))
+                        {
+                            var blockType = (int)OverrideBlockTypeForFace(chunk.Blocks[x, y, z], Side.Left);
+                            vertices.AddRange([-0.5f + worldX,  0.5f + worldY,  0.5f + worldZ, -1f, 0f, 0f,  TextureX(1.0f, blockType), TextureY(0.0f, blockType)]);
+                            vertices.AddRange([-0.5f + worldX,  0.5f + worldY, -0.5f + worldZ, -1f, 0f, 0f,  TextureX(1.0f, blockType), TextureY(1.0f, blockType)]);
+                            vertices.AddRange([-0.5f + worldX, -0.5f + worldY, -0.5f + worldZ, -1f, 0f, 0f,  TextureX(0.0f, blockType), TextureY(1.0f, blockType)]);
+                            vertices.AddRange([-0.5f + worldX, -0.5f + worldY, -0.5f + worldZ, -1f, 0f, 0f,  TextureX(0.0f, blockType), TextureY(1.0f, blockType)]);
+                            vertices.AddRange([-0.5f + worldX, -0.5f + worldY,  0.5f + worldZ, -1f, 0f, 0f,  TextureX(0.0f, blockType), TextureY(0.0f, blockType)]);
+                            vertices.AddRange([-0.5f + worldX,  0.5f + worldY,  0.5f + worldZ, -1f, 0f, 0f,  TextureX(1.0f, blockType), TextureY(0.0f, blockType)]);
+                        }
                         
                         // Right
-                        vertices.AddRange([0.5f + worldX,  0.5f + worldY,  0.5f + worldZ,  1.0f, 0.0f]);
-                        vertices.AddRange([0.5f + worldX,  0.5f + worldY, -0.5f + worldZ,  1.0f, 1.0f]);
-                        vertices.AddRange([0.5f + worldX, -0.5f + worldY, -0.5f + worldZ,  0.0f, 1.0f]);
-                        vertices.AddRange([0.5f + worldX, -0.5f + worldY, -0.5f + worldZ,  0.0f, 1.0f]);
-                        vertices.AddRange([0.5f + worldX, -0.5f + worldY,  0.5f + worldZ,  0.0f, 0.0f]);
-                        vertices.AddRange([0.5f + worldX,  0.5f + worldY,  0.5f + worldZ,  1.0f, 0.0f]);
-                        
-                        // Bottom
-                        vertices.AddRange([-0.5f + worldX, -0.5f + worldY, -0.5f + worldZ,  0.0f, 1.0f]);
-                        vertices.AddRange([0.5f + worldX, -0.5f + worldY, -0.5f + worldZ,  1.0f, 1.0f]);
-                        vertices.AddRange([0.5f + worldX, -0.5f + worldY,  0.5f + worldZ,  1.0f, 0.0f]);
-                        vertices.AddRange([0.5f + worldX, -0.5f + worldY,  0.5f + worldZ,  1.0f, 0.0f]);
-                        vertices.AddRange([-0.5f + worldX, -0.5f + worldY,  0.5f + worldZ,  0.0f, 0.0f]);
-                        vertices.AddRange([-0.5f + worldX, -0.5f + worldY, -0.5f + worldZ,  0.0f, 1.0f]);
+                        if (!chunk.IsSolid(x + 1, y, z))
+                        {
+                            var blockType = (int)OverrideBlockTypeForFace(chunk.Blocks[x, y, z], Side.Right);
+                            vertices.AddRange([0.5f + worldX,  0.5f + worldY,  0.5f + worldZ, 1f, 0f, 0f,  TextureX(1.0f, blockType), TextureY(0.0f, blockType)]);
+                            vertices.AddRange([0.5f + worldX,  0.5f + worldY, -0.5f + worldZ, 1f, 0f, 0f,  TextureX(1.0f, blockType), TextureY(1.0f, blockType)]);
+                            vertices.AddRange([0.5f + worldX, -0.5f + worldY, -0.5f + worldZ, 1f, 0f, 0f,  TextureX(0.0f, blockType), TextureY(1.0f, blockType)]);
+                            vertices.AddRange([0.5f + worldX, -0.5f + worldY, -0.5f + worldZ, 1f, 0f, 0f,  TextureX(0.0f, blockType), TextureY(1.0f, blockType)]);
+                            vertices.AddRange([0.5f + worldX, -0.5f + worldY,  0.5f + worldZ, 1f, 0f, 0f,  TextureX(0.0f, blockType), TextureY(0.0f, blockType)]);
+                            vertices.AddRange([0.5f + worldX,  0.5f + worldY,  0.5f + worldZ, 1f, 0f, 0f,  TextureX(1.0f, blockType), TextureY(0.0f, blockType)]);
+                        }
                     }
                 }
             }
@@ -113,11 +137,60 @@ public class Mesh
         GL.BufferData(BufferTarget.ArrayBuffer, mesh.Vertices.Length * sizeof(float), mesh.Vertices, BufferUsage.StaticDraw);
         
         GL.EnableVertexAttribArray(0);
-        GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 5 * sizeof(float), 0);
+        GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 8 * sizeof(float), 0);
         
         GL.EnableVertexAttribArray(1);
-        GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, 5 * sizeof(float), 3 * sizeof(float));
+        GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, 8 * sizeof(float), 3 * sizeof(float));
+        
+        GL.EnableVertexAttribArray(2);
+        GL.VertexAttribPointer(2, 2, VertexAttribPointerType.Float, false, 8 * sizeof(float), 6 * sizeof(float));
 
         return mesh;
     }
+    
+    const int atlasBlockSizeInPixels = 16;
+    private const int atlasWidthInBlocks = 16;
+    private const int atlasHeightInBlocks = 16;
+
+    private static float TextureX(float x, int blockId)
+    {
+        // vec2 texSize = vec2(16.0, 16.0);
+        // vec2 texOffset = vec2(1.0, (16.0 - 1.0));
+        // FragColor = texture(texture0, (texCoord + texOffset) / texSize);
+        var offset = blockId % atlasWidthInBlocks;
+        return (x + offset) / atlasBlockSizeInPixels;
+    }
+
+    private static float TextureY(float y, int blockId)
+    {
+        var offset = blockId / atlasHeightInBlocks;
+        return (y - offset - 1.0f) / atlasBlockSizeInPixels;
+    }
+
+    private static BlockType OverrideBlockTypeForFace(BlockType type, Side side)
+    {
+        if (type == BlockType.Grass)
+        {
+            return side switch
+            {
+                Side.Top => BlockType.Grass,
+                Side.Bottom => BlockType.Dirt,
+                _ => BlockType.GrassSide
+            };
+        }
+
+        return type;
+    }
+
+    enum Side
+    {
+        Top,
+        Bottom,
+        Front,
+        Back,
+        Left,
+        Right,
+    }
+    
+    
 }

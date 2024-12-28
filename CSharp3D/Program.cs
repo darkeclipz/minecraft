@@ -9,6 +9,7 @@ using OpenTK.Windowing.GraphicsLibraryFramework;
 // Implement ImGuiNet too!
 
 using var game = new Game(1920, 1080, "Hello World!");
+game.VSync = VSyncMode.Off;
 game.Run();
 
 public class Game : GameWindow
@@ -38,64 +39,64 @@ public class Game : GameWindow
     private Chunk _chunk;
 
     private World _world;
-    
-    private float[] _vertices =
-    [
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-        0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-        0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-        0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-        0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-        0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-        0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
-    ];
-    
-    private readonly uint[] _indices =
-    [ 
-        0, 1, 3,   // first triangle
-        1, 2, 3    // second triangle
-    ];
-    
-    private readonly float[] _texCoords =
-    [
-        0.0f, 0.0f,  // lower-left corner  
-        1.0f, 0.0f,  // lower-right corner
-        0.5f, 1.0f   // top-center corner
-    ];
+    //
+    // private float[] _vertices =
+    // [
+    //     -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+    //     0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+    //     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+    //     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+    //     -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+    //     -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+    //
+    //     -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+    //     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+    //     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+    //     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+    //     -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+    //     -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+    //
+    //     -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    //     -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+    //     -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    //     -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    //     -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+    //     -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    //
+    //     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    //     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+    //     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    //     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    //     0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+    //     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    //
+    //     -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    //     0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+    //     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+    //     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+    //     -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+    //     -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    //
+    //     -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+    //     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+    //     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    //     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    //     -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+    //     -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+    // ];
+    //
+    // private readonly uint[] _indices =
+    // [ 
+    //     0, 1, 3,   // first triangle
+    //     1, 2, 3    // second triangle
+    // ];
+    //
+    // private readonly float[] _texCoords =
+    // [
+    //     0.0f, 0.0f,  // lower-left corner  
+    //     1.0f, 0.0f,  // lower-right corner
+    //     0.5f, 1.0f   // top-center corner
+    // ];
     
     public Game(int width, int height, string title)
         : base(GameWindowSettings.Default, new NativeWindowSettings 
@@ -115,7 +116,7 @@ public class Game : GameWindow
         foreach (var chunk in _world.Chunks)
         {
             GL.BindVertexArray(chunk.Mesh.VertexArrayObject);
-            GL.DrawArrays(PrimitiveType.Triangles, 0, chunk.Mesh.Vertices.Length / 5);    
+            GL.DrawArrays(PrimitiveType.Triangles, 0, chunk.Mesh.Vertices.Length / 8);    
         }
         
         // GL.DrawElements(PrimitiveType.Triangles, _indices.Length, DrawElementsType.UnsignedInt, 0);
@@ -213,9 +214,9 @@ public class Game : GameWindow
         
         _shader.SetMatrix4("model", ref rotation);
         
-        var blockIdLoc = _shader.GetUniformLocation("blockId");
-        const int numberOfBlocks = 11;
-        GL.Uniform1i(blockIdLoc, 1);
+        // var blockIdLoc = _shader.GetUniformLocation("blockId");
+        // const int numberOfBlocks = 11;
+        // GL.Uniform1i(blockIdLoc, 1);
         
         // Update block.
         
@@ -261,28 +262,30 @@ public class Game : GameWindow
         _shader = new Shader("Shaders/shader.vert", "Shaders/shader.frag");
         _shader.Use();
         
-        var vertexLocation = _shader.GetAttributeLocation("aPosition");
-        GL.EnableVertexAttribArray((uint)vertexLocation);
-        GL.VertexAttribPointer((uint)vertexLocation, 3, VertexAttribPointerType.Float, false, 5 * sizeof(float), 0);
-        
-        var texCoordLocation = _shader.GetAttributeLocation("aTexCoord");
-        GL.EnableVertexAttribArray((uint)texCoordLocation);
-        GL.VertexAttribPointer((uint)texCoordLocation, 2, VertexAttribPointerType.Float, false, 5 * sizeof(float), 3 * sizeof(float));
-        
-        var blockIdLoc = _shader.GetUniformLocation("blockId");
-        GL.Uniform1i(blockIdLoc, 0);
+        //
+        // var vertexLocation = _shader.GetAttributeLocation("aPosition");
+        // GL.EnableVertexAttribArray((uint)vertexLocation);
+        // GL.VertexAttribPointer((uint)vertexLocation, 3, VertexAttribPointerType.Float, false, 5 * sizeof(float), 0);
+        //
+        // var texCoordLocation = _shader.GetAttributeLocation("aTexCoord");
+        // GL.EnableVertexAttribArray((uint)texCoordLocation);
+        // GL.VertexAttribPointer((uint)texCoordLocation, 2, VertexAttribPointerType.Float, false, 5 * sizeof(float), 3 * sizeof(float));
+        //
+        // var blockIdLoc = _shader.GetUniformLocation("blockId");
+        // GL.Uniform1i(blockIdLoc, 0);
         
         _texture = new Texture("Textures/tile_atlas.png");
         _texture.Use(TextureUnit.Texture0);
 
         _camera = new Camera
         {
-            Position = new Vector3(0, 65, 0)
+            Position = new Vector3(0, 65, 0),
+            Yaw = 45f,
         };
 
-        Matrix4 model = Matrix4.CreateRotationX(MathHelper.DegreesToRadians(-55.0f));
+        Matrix4 model = Matrix4.CreateRotationX(MathHelper.DegreesToRadians(0f));
         Matrix4 view = _camera.GetViewMatrix();
-        Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45.0f), (float)_width / _height, 0.1f, 100.0f);
+        Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45.0f), (float)_width / _height, 0.1f, 500.0f);
         
         _shader.SetMatrix4("model", ref model);
         _shader.SetMatrix4("view", ref view);

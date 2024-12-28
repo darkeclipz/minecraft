@@ -10,7 +10,7 @@ public class Camera
     public float Speed { get; } = 5.0f;
     public float Sensitivity { get; } = 0.05f;
     public float Pitch { get; set; } = 0f;
-    public float Yaw { get; set; } = -90f;
+    public float Yaw { get; set; } = 0f;//-90f;
 
     public Matrix4 GetViewMatrix()
     {
