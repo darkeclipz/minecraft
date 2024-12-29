@@ -35,6 +35,12 @@ public class Game : GameWindow
     private Vector2 _lastMousePosition = Vector2.Zero;
 
     private bool _firstMove = true;
+
+    private static CancellationTokenSource CancellationTokenSource = new();
+
+    public static readonly int WorldSeed = (int)Random.Shared.NextInt64();
+    
+    public static CancellationToken CancellationToken { get; private set; }
     
     public Game(int width, int height, string title)
         : base(GameWindowSettings.Default, new NativeWindowSettings 
@@ -45,6 +51,8 @@ public class Game : GameWindow
         _height = height;
         
         InitFpsCounter();
+        
+        CancellationToken = CancellationTokenSource.Token;
     }
 
     private void InitFpsCounter()
@@ -68,7 +76,7 @@ public class Game : GameWindow
         GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
         _shader.Use();
         
-        foreach (var chunk in _world.Chunks)
+        foreach (var chunk in _world.Chunks.Values)
         {
             if (!chunk.IsLoaded) continue;
             
@@ -99,6 +107,7 @@ public class Game : GameWindow
 
         if (input.IsKeyDown(Keys.Escape))
         {
+            CancellationTokenSource.Cancel();
             Close();
         }
 
@@ -184,6 +193,13 @@ public class Game : GameWindow
         Matrix4 view = _camera.GetViewMatrix();
         _shader.SetMatrix4("view", ref view);
         
+        // Update world
+        if (Vector2.Distance(_camera.Position.Xz, _world.CurrentChunk.Position.Xz) > World.UpdateDistanceThreshold)
+        {
+            var nearestChunk = _world.GetNearestChunk(_camera.Position.Xz);
+            _world.UpdateCurrentChunk(_camera.Position, nearestChunk);
+        }
+        
         LimitFps(dt);
     }
 
@@ -217,7 +233,8 @@ public class Game : GameWindow
         GL.ClearColor(135f / 255f, 206f / 255f, 245f / 255f, 1f);
         
         Console.WriteLine("Generating world...");
-        _world = new World(renderDistance: 30);
+        
+        _world = new World(renderDistance: 8);
 
         // _vertices = _chunk.Mesh.Vertices;
 

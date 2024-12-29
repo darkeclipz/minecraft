@@ -1,65 +1,132 @@
 using System.Net.Http.Headers;
+using System.Runtime.CompilerServices;
 using OpenTK.Mathematics;
 
 namespace CSharp3D;
 
 public class World
 {
-    private readonly int _renderDistance;
+    public Chunk CurrentChunk { get; private set; }
     
-    public Chunk[,] Chunks { get; private set; }
+    public Dictionary<Vector2, Chunk> Chunks { get; private set; } = new ();
+    
+    private List<ChunkGenerationRequest> _chunkGenerationRequests = [];
+    
+    private ChunkGenerator _chunkGenerator;
+    
+    private readonly int _renderDistance;
+
+    public const int UpdateDistanceThreshold = 20;
 
     public World(int renderDistance)
     {
         _renderDistance = renderDistance;
-        
-        Chunks = new Chunk[2 * _renderDistance + 1, 2 * _renderDistance + 1];
-        
-        List<ChunkGenerationRequest> chunkGenerationRequests = [];
-        
-        for (var x = 0; x < Chunks.GetLength(0); x++)
-        {
-            for (var y = 0; y < Chunks.GetLength(1); y++)
-            {
-                Chunks[x, y] = new Chunk
-                {
-                    Position = new Vector3((x - renderDistance) * Chunk.Dimensions.X - renderDistance, 0, (y - renderDistance) * Chunk.Dimensions.Z)
-                };
+        _chunkGenerator = new ChunkGenerator(this, Game.CancellationToken);
 
-                chunkGenerationRequests.Add(new ChunkGenerationRequest
-                {
-                    Chunk = Chunks[x, y],
-                    DistanceFromCamera = Vector3.Distance(Chunks[x, y].Position, Vector3.Zero)
-                });
+        foreach (var point in GetPointsAroundChunkWithinRenderDistance(Vector3.Zero, _renderDistance))
+        {
+            LoadChunk(point.Xz);
+        }
+
+        CurrentChunk = Chunks.Values.First();
+
+        DispatchGenerationRequests();
+    }
+
+    public void UpdateCurrentChunk(Vector3 position, Chunk newChunk)
+    {
+        if (CurrentChunk == newChunk) return;
+
+        var pointsAroundPlayer = GetPointsAroundChunkWithinRenderDistance(newChunk.Position, _renderDistance).ToList();
+
+        foreach (var point in pointsAroundPlayer)
+        {
+            var chunkMidpoint = point + new Vector3(Chunk.Dimensions.X / 2, 0, Chunk.Dimensions.Z / 2);
+            var distance = Vector2.Distance(position.Xz, chunkMidpoint.Xz) / Chunk.Dimensions.X;
+            
+            if (!Chunks.ContainsKey(point.Xz) && distance < _renderDistance + 1)
+            {
+                LoadChunk(point.Xz);
+            }
+        }
+        
+        CurrentChunk = newChunk;
+
+        foreach (var chunk in Chunks.Values.ToList())
+        {
+            if (!pointsAroundPlayer.Contains(chunk.Position))
+            {
+                UnloadChunk(chunk);
+            }
+        }
+        
+        DispatchGenerationRequests();
+        
+        Console.WriteLine($"Current chunk updated to chunk {newChunk.Position.X}, {newChunk.Position.Z}");
+    }
+
+    public Chunk GetNearestChunk(Vector2 position)
+    {
+        Chunk? nearestChunk = Chunks.Values.First();
+        var minDistance = double.MaxValue;
+
+        foreach (var chunk in Chunks.Values)
+        {
+            var distance = Vector2.DistanceSquared(position, chunk.Position.Xz);
+            
+            if (distance < minDistance)
+            {
+                minDistance = distance;
+                nearestChunk = chunk;
             }
         }
 
-        foreach (var requestedChunk in chunkGenerationRequests
+        return nearestChunk;
+    }
+
+    private void LoadChunk(Vector2 position)
+    {
+        var chunkPosition = new Vector3(position.X, 0, position.Y);
+
+        Chunks[chunkPosition.Xz] = new Chunk(chunkPosition);
+            
+        _chunkGenerationRequests.Add(new ChunkGenerationRequest
+        {
+            Chunk = Chunks[chunkPosition.Xz],
+            DistanceFromCamera = Vector3.Distance(Chunks[chunkPosition.Xz].Position, Vector3.Zero)
+        });
+    }
+    
+    private void DispatchGenerationRequests()
+    {
+        foreach (var requestedChunk in _chunkGenerationRequests
                      .OrderBy(gr => gr.DistanceFromCamera)
                      .Select(gr => gr.Chunk))
         {
-            Task.Run(() =>
-            {
-                Thread.Sleep(20);
-                TerrainGenerator.GenerateChunk(requestedChunk, this);
-                requestedChunk.UpdateMesh(this);
-            });
+            _chunkGenerator.DispatchChunk(requestedChunk);
         }
+
+        _chunkGenerationRequests.Clear();
     }
+
+    private void UnloadChunk(Chunk chunk)
+    {
+        Chunks.Remove(chunk.Position.Xz);
+        chunk.Dispose();
+    }
+
+    private IEnumerable<Vector3> GetPointsAroundChunkWithinRenderDistance(Chunk chunk, int renderDistance) 
+        => GetPointsAroundChunkWithinRenderDistance(chunk.Position, renderDistance);
     
-    public BlockRef this[Vector3i position] => this[position.X, position.Y, position.Z];
-
-    public BlockRef? this[int x, int y, int z]
+    private IEnumerable<Vector3> GetPointsAroundChunkWithinRenderDistance(Vector3 position, int renderDistance)
     {
-        get
+        for (int x = -renderDistance; x <= renderDistance; x++)
+        for (int z = -renderDistance; z <= renderDistance; z++)
         {
-            return default(BlockRef);
-        }
-    }
+            var chunkX = position.X + x * Chunk.Dimensions.X;
+            var chunkZ = position.Z + z * Chunk.Dimensions.Z;
 
-    class ChunkGenerationRequest
-    {
-        public Chunk Chunk { get; init; }
-        public float DistanceFromCamera { get; init; }
+            yield return new Vector3(chunkX, 0, chunkZ);
+        }
     }
 }

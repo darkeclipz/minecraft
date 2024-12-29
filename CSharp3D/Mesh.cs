@@ -3,7 +3,7 @@ using OpenTK.Graphics.OpenGLES2;
 
 namespace CSharp3D;
 
-public class Mesh
+public class Mesh : IDisposable
 {
     public float[] Vertices { get; private set; }
     
@@ -127,19 +127,18 @@ public class Mesh
         };
     }
 
-    public bool HasLoaded = false;
+    public bool IsLoaded = false;
 
     public void Use()
     {
-        if (!HasLoaded)
+        if (!IsLoaded)
         {
-            HasLoaded = true;
+            IsLoaded = true;
             
             VertexArrayObject = GL.GenVertexArray();
             GL.BindVertexArray(VertexArrayObject);
         
             VertexBufferObject = GL.GenBuffer();
-            
         
             GL.BindBuffer(BufferTarget.ArrayBuffer, VertexArrayObject);
             GL.BufferData(BufferTarget.ArrayBuffer, Vertices.Length * sizeof(float), Vertices, BufferUsage.StaticDraw);
@@ -152,6 +151,8 @@ public class Mesh
         
             GL.EnableVertexAttribArray(2);
             GL.VertexAttribPointer(2, 2, VertexAttribPointerType.Float, false, 8 * sizeof(float), 6 * sizeof(float));
+            
+            Console.WriteLine($"Loaded mesh VAO: {VertexArrayObject}.");
         }
     }
 
@@ -210,6 +211,18 @@ public class Mesh
         Left,
         Right,
     }
+
+    private bool disposed = false;
     
-    
+    public void Dispose()
+    {
+        if (disposed) return;
+        disposed = true;
+        IsLoaded = false;
+        
+        GL.DeleteVertexArray(VertexArrayObject);
+        GL.DeleteBuffer(VertexBufferObject);
+        
+        Console.WriteLine($"Disposed mesh VAO: {VertexArrayObject}.");
+    }
 }
