@@ -28,7 +28,11 @@ public class World
 
     public void Initialize(Camera camera)
     {
-        foreach (var point in GetPointsAroundChunkWithinRenderDistance(camera.Position, RenderDistance))
+        var x = ((int)camera.Position.X / Chunk.Dimensions.X) * Chunk.Dimensions.X;
+        var z = ((int)camera.Position.Z / Chunk.Dimensions.Z) * Chunk.Dimensions.Z;
+        var origin = new Vector3(x, 0, z);
+        
+        foreach (var point in GetPointsAroundChunkWithinRenderDistance(origin, RenderDistance))
         {
             LoadChunk(camera.Position, point);
         }

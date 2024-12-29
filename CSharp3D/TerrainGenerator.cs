@@ -7,8 +7,6 @@ public static class TerrainGenerator
 {
     public static void GenerateChunk(Chunk chunk, World world)
     {
-        var seed = chunk.GetHashCode();
-
         // Overworld
         {
             for (int x = 0; x < Chunk.Dimensions.X; x++)
@@ -98,15 +96,25 @@ public static class TerrainGenerator
             
             // Trees
             {
-                var rng = new Random(seed);
+                var rng = new Random(chunk.Position.GetHashCode());
         
                 // Place random tree.
                 var rx = rng.Next(0, Chunk.Dimensions.X);
                 var rz = rng.Next(0, Chunk.Dimensions.Z);
                 var ry = chunk.HeightAt(rx, rz);
+                
+                var worldX = rx + chunk.Position.X;
+                var worldZ = rz + chunk.Position.Z;
+                
+                var amplitude = 0.02f;
+                var treeGradient = Noise.GradientNoise3D(amplitude * worldX, 0.1f * ry, amplitude * worldZ,
+                    Game.WorldSeed);
+                
                 var treeSize = rng.Next(3, 8);
+
+                var isGrass = chunk.Blocks[rx, ry, rz] == BlockType.Grass;
         
-                if (ry > 0 && ry + treeSize + 1 < Chunk.Dimensions.Y)
+                if (isGrass && treeGradient < 0.0 && ry > 0 && ry + treeSize + 1 < Chunk.Dimensions.Y)
                 {
                     ry += 1;
             
@@ -116,6 +124,29 @@ public static class TerrainGenerator
                     }
             
                     chunk.Blocks[rx, ry + treeSize, rz] = BlockType.Leaves;
+
+                    var treeLeafRef = chunk.GetBlockRef(rx, ry + treeSize, rz);
+                    
+                    List<BlockRef> extraLeaves = [];
+
+                    foreach (var neighbour in treeLeafRef.GetNeighbours())
+                    {
+                        if (neighbour.IsAir)
+                        {
+                            neighbour.SetBlockType(BlockType.Leaves);    
+                        }
+                        
+                        extraLeaves.AddRange(neighbour.GetNeighbours());
+                    }
+
+                    foreach (var leaf in extraLeaves.Where(leave => leave.IsAir))
+                    {
+                        if (rng.NextDouble() < 0.25 + (treeSize - 2) * 0.04)
+                        {
+                            leaf.SetBlockType(BlockType.Leaves);
+                        }
+                    }
+                    
                 }
             }
             
