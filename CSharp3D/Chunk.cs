@@ -16,6 +16,8 @@ public class Chunk : IDisposable
     public bool IsLoaded { get; private set; } = false;
     
     public AABB OnEnterBoundary { get; }
+    
+    public DateTimeOffset CreatedAt { get; private set; } = DateTimeOffset.Now;
 
     public Chunk(Vector3 position)
     {
@@ -60,10 +62,7 @@ public class Chunk : IDisposable
         return 0;
     }
 
-    public Vector2 GetMidpointXZ()
-    {
-        return new Vector2(Position.X + Dimensions.X / 2, Position.Z - Dimensions.Z / 2);
-    }
+    public Vector3 Midpoint => new Vector3(Position.X + Dimensions.X / 2, Position.Y + Dimensions.Y / 2, Position.Z - Dimensions.Z / 2);
 
     private bool disposed = false;
     
@@ -72,5 +71,13 @@ public class Chunk : IDisposable
         if (disposed) return;
         disposed = true;
         Mesh?.Dispose();
+    }
+
+    public float GetOpacity()
+    {
+        var timeAlive = DateTimeOffset.UtcNow.Subtract(CreatedAt);
+        var millisecondsAlive = timeAlive.TotalMilliseconds;
+        var fadeInTimeInMilliseconds = 300;
+        return (float)Math.Clamp(millisecondsAlive / fadeInTimeInMilliseconds, 0.0, 1.0);
     }
 }

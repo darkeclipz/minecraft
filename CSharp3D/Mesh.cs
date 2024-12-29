@@ -152,7 +152,7 @@ public class Mesh : IDisposable
             GL.EnableVertexAttribArray(2);
             GL.VertexAttribPointer(2, 2, VertexAttribPointerType.Float, false, 8 * sizeof(float), 6 * sizeof(float));
             
-            Console.WriteLine($"Loaded mesh VAO: {VertexArrayObject}.");
+            // Console.WriteLine($"Loaded mesh VAO: {VertexArrayObject}.");
         }
     }
 
@@ -223,6 +223,6 @@ public class Mesh : IDisposable
         GL.DeleteVertexArray(VertexArrayObject);
         GL.DeleteBuffer(VertexBufferObject);
         
-        Console.WriteLine($"Disposed mesh VAO: {VertexArrayObject}.");
+        // Console.WriteLine($"Disposed mesh VAO: {VertexArrayObject}.");
     }
 }

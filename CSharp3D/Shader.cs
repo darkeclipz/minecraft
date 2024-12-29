@@ -81,6 +81,12 @@ public class Shader : IDisposable
     {
         return GL.GetAttribLocation(_handle, attribute);
     }
+    
+    public void SetFloat(string name, float value)
+    {
+        var loc = GetUniformLocation(name);
+        GL.Uniform1f(loc, value);
+    }
 
     public void SetMatrix4(string name, ref Matrix4 matrix)
     {
@@ -92,6 +98,12 @@ public class Shader : IDisposable
     {
         var loc = GetUniformLocation(name);
         GL.Uniform3f(loc, vector.X, vector.Y, vector.Z);
+    }
+    
+    public void SetVector4(string name, Vector4 vector)
+    {
+        var loc = GetUniformLocation(name);
+        GL.Uniform4f(loc, vector.X, vector.Y, vector.Z, vector.W);
     }
 
     protected virtual void Dispose(bool disposing)

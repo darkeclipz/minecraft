@@ -8,21 +8,25 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="cfd5feee-a153-4a1f-b87b-fde73bb04f56" name="Changes" comment=".">
-      <change afterPath="$PROJECT_DIR$/CSharp3D/AABB.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CSharp3D/ChunkGenerator.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CSharp3D/GradientNoise2D.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CSharp3D/Color.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CSharp3D/Game.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CSharp3D/GradientNoise3D.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.CSharp3D/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.CSharp3D/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CSharp3D.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D.sln.DotSettings.user" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CSharp3D/CSharp3D.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/CSharp3D.csproj" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CSharp3D/Camera.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/Camera.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CSharp3D/Chunk.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/Chunk.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CSharp3D/ChunkGenerator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/ChunkGenerator.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CSharp3D/Mesh.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/Mesh.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CSharp3D/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CSharp3D/Shader.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/Shader.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CSharp3D/Shaders/shader.frag" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/Shaders/shader.frag" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CSharp3D/Shaders/shader.vert" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/Shaders/shader.vert" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CSharp3D/TerrainGenerator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/TerrainGenerator.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CSharp3D/World.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/World.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CSharp3D/bin/Debug/net9.0/CSharp3D.dll" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/bin/Debug/net9.0/CSharp3D.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CSharp3D/bin/Debug/net9.0/CSharp3D.exe" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/bin/Debug/net9.0/CSharp3D.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CSharp3D/bin/Debug/net9.0/CSharp3D.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/bin/Debug/net9.0/CSharp3D.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CSharp3D/bin/Debug/net9.0/Shaders/shader.frag" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/bin/Debug/net9.0/Shaders/shader.frag" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CSharp3D/bin/Debug/net9.0/Shaders/shader.vert" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/bin/Debug/net9.0/Shaders/shader.vert" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CSharp3D/obj/Debug/net9.0/CSharp3D.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/obj/Debug/net9.0/CSharp3D.AssemblyInfo.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CSharp3D/obj/Debug/net9.0/CSharp3D.AssemblyInfoInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/obj/Debug/net9.0/CSharp3D.AssemblyInfoInputs.cache" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CSharp3D/obj/Debug/net9.0/CSharp3D.csproj.CoreCompileInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/obj/Debug/net9.0/CSharp3D.csproj.CoreCompileInputs.cache" afterDir="false" />
@@ -56,6 +60,7 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/9823fe3cbd4448effa6ee366a337bb9c6c9123e0734afd44a03e83733979/GL.Pointers.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/acd79d3d22e4b589dbb56cb2c4be2693a86c5f8c2c77dbf52c39be1aa8fe1/NativeWindow.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/e29e4f90bf55c7e3f564e6873b19a222274128ce32d2828c985c4608e167b76/Thread.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/e5d623ea960f2c3c9fda144954d339f8d4cd3dad6dd8bd4ab96093a010ab/Dictionary.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProjectColorInfo">{
@@ -119,7 +124,7 @@
       <updated>1734613120878</updated>
       <workItem from="1734613121438" duration="9259000" />
       <workItem from="1734628235943" duration="14296000" />
-      <workItem from="1735391725554" duration="46212000" />
+      <workItem from="1735391725554" duration="57026000" />
     </task>
     <task id="LOCAL-00001" summary="Add git ignore.">
       <option name="closed" value="true" />
@@ -185,7 +190,15 @@
       <option name="project" value="LOCAL" />
       <updated>1735474546831</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary=".">
+      <option name="closed" value="true" />
+      <created>1735482939630</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1735482939630</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

@@ -8,6 +8,11 @@ in vec2 texCoord;
 
 uniform sampler2D texture0;
 uniform vec3 camPos;
+uniform vec4 fogColor;
+uniform float fogDensity;
+uniform float fogNear;
+uniform float fogFar;
+uniform float opacity;
 
 float linearFog(float d, float near, float far)
 {
@@ -19,24 +24,13 @@ float linearFog(float d, float near, float far)
 void main()
 {
     vec3 lightColor = vec3(1.0, 1.0, 1.0);
-    vec3 lightPos = vec3(0.0, 1.0, 0.0);
-    
-    float ambientStrength = 0.7;
-    vec3 ambient = ambientStrength * lightColor;
-    
-    vec3 lightDir = normalize(vec3(0.3, 1.0, 0.4));
-    float diff = max(dot(normal, lightDir), 0.0);
-    vec3 diffuse = diff * lightColor * (1.0 - ambientStrength);
-    
-    vec4 color = texture(texture0, texCoord); // * (ambient + diffuse);
+    vec3 lightPos = vec3(1);
+    vec4 color = texture(texture0, texCoord);
+    float lambert = max(dot(normal, lightPos), 0.8);
     float d = distance(camPos, fragPos);
-    
-    vec4 fogColor = vec4(135.0 / 255.0, 206. / 255., 245. / 255., 1.0);
-    
-    float fogDensity = 0.008;
-    float fogFactor = linearFog(d, 100.0, 500.0);
+    float fogFactor = linearFog(d, fogNear, fogFar);
     color = mix(color, fogColor, fogFactor);
-    
+    color *= vec4(lambert, lambert, lambert, 1.0);
+    color *= vec4(1.0, 1.0, 1.0, opacity);
     FragColor = color; 
-    // FragColor = vec4(normal * 0.5 + 0.5, 1.0);
 }
