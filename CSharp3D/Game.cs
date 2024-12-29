@@ -86,7 +86,7 @@ public class Game : GameWindow
             _shader.SetFloat("opacity", chunk.GetOpacity());
             
             GL.BindVertexArray(chunk.Mesh.VertexArrayObject);
-            GL.DrawArrays(PrimitiveType.Triangles, 0, chunk.Mesh.Vertices.Length / 8);    
+            GL.DrawArrays(PrimitiveType.Triangles, 0, chunk.Mesh.Vertices.Length / Mesh.VertexBufferCount);    
         }
         
         SwapBuffers();
@@ -118,7 +118,7 @@ public class Game : GameWindow
 
         if (input.IsKeyDown(Keys.LeftShift))
         {
-            sprint = 2f;
+            sprint = _camera.SprintMultiplier;
         }
 
         if (input.IsKeyReleased(Keys.R))
@@ -202,7 +202,7 @@ public class Game : GameWindow
         _shader.SetMatrix4("view", ref view);
         
         // Update world
-        if (Vector2.Distance(_camera.Position.Xz, _world.CurrentChunk.Position.Xz) > World.UpdateDistanceThreshold)
+        if (Vector2.DistanceSquared(_camera.Position.Xz, _world.CurrentChunk.Position.Xz) > World.UpdateDistanceThreshold * World.UpdateDistanceThreshold)
         {
             Stopwatch sw = Stopwatch.StartNew();
             var nearestChunk = _world.GetNearestChunk(_camera.Position.Xz);
@@ -281,7 +281,7 @@ public class Game : GameWindow
             Position = new Vector3(0, 115, 0),
             Yaw = 45f,
             Pitch = -15f,
-            RenderDistance = 13,
+            RenderDistance = 25,
         };
         
         _world = new World(_camera);

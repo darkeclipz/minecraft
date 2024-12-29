@@ -13,4 +13,7 @@ public enum BlockType : byte
     Tree = 8,
     TreeTop = 9,
     Leaves = 10,
+    SinisterLeaves = 11,
+    SinisterGrass = 12,
+    SinisterGrassSide = 13,
 }

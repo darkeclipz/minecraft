@@ -4,13 +4,22 @@ using OpenTK.Mathematics;
 
 namespace CSharp3D;
 
+public struct Block
+{
+    public BlockType Type { get; set; }
+    public int LightLevel { get; set; }
+    
+    public static Block LitAir = new Block { Type = BlockType.Air, LightLevel = 15 };
+    public static Block UnlitAir = new Block { Type = BlockType.Air, LightLevel = 0 };
+}
+
 public class Chunk : IDisposable
 {
     public Vector3 Position { get; }
     
     public static Vector3i Dimensions => new (16, 384, 16);
 
-    public BlockType[,,] Blocks { get; set; } = new BlockType[Dimensions.X, Dimensions.Y, Dimensions.Z];
+    public Block[,,] Blocks { get; set; } = new Block[Dimensions.X, Dimensions.Y, Dimensions.Z];
 
     public Mesh Mesh { get; private set; } = null!;
 
@@ -20,9 +29,12 @@ public class Chunk : IDisposable
     
     public DateTimeOffset CreatedAt { get; private set; } = DateTimeOffset.Now;
 
-    public Chunk(Vector3 position)
+    private World _world;
+
+    public Chunk(Vector3 position, World world)
     {
         Position = position;
+        _world = world;
         
         BoundingBox = new AABB
         {
@@ -47,7 +59,7 @@ public class Chunk : IDisposable
         
         var block = Blocks[x, y, z];
 
-        return block != BlockType.Air;
+        return block.Type != BlockType.Air;
     }
 
     public int HeightAt(int x, int z)
@@ -57,7 +69,7 @@ public class Chunk : IDisposable
         
         for (var y = Dimensions.Y - 1; y >= 0; y--)
         {
-            if (Blocks[x, y, z] != BlockType.Air) return y;
+            if (Blocks[x, y, z].Type != BlockType.Air) return y;
         }
 
         return 0;
@@ -82,6 +94,7 @@ public class Chunk : IDisposable
         return (float)Math.Clamp(millisecondsAlive / fadeInTimeInMilliseconds, 0.0, 1.0);
     }
 
+    public BlockRef GetBlockRef(Vector3 position) => GetBlockRef((int)position.X, (int)position.Y, (int)position.Z);
     public BlockRef GetBlockRef(int x, int y, int z)
     {
         if (x < 0 || x > Dimensions.X - 1) throw new ArgumentOutOfRangeException(nameof(x));

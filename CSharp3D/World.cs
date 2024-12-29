@@ -107,7 +107,7 @@ public class World
 
         foreach (var chunk in Chunks.Values)
         {
-            var distance = Vector2.Distance(chunk.Midpoint.Xz, position.Xz);
+            var distance = Vector2.DistanceSquared(chunk.Midpoint.Xz, position.Xz);
             sortedChunks.Add((distance, chunk));
         }
         
@@ -127,14 +127,34 @@ public class World
         Initialize(camera);
     }
 
+    public BlockRef? GetBlockOrNull(Vector3 worldPos)
+    {
+        var chunk = Chunks.Values.FirstOrDefault(c => c.BoundingBox.IntersectsWith(worldPos));
+
+        if (chunk is null)
+        {
+            Console.WriteLine($"WARNING: Unable to find block with world coordinates {worldPos}.");
+            return null;
+        }
+
+        var localPosition = worldPos - chunk.Position;
+
+        return chunk.GetBlockRef(localPosition);
+    }
+
+    public Chunk? FindChunkOrNull(Vector3 position)
+    {
+        return Chunks.Values.FirstOrDefault(c => c.BoundingBox.IntersectsWith(position));
+    }
+
     private void LoadChunk(Vector3 cameraPosition, Vector3 chunkPosition)
     {
-        Chunks[chunkPosition.Xz] = new Chunk(chunkPosition);
+        Chunks[chunkPosition.Xz] = new Chunk(chunkPosition, this);
             
         _chunkGenerationRequests.Add(new ChunkGenerationRequest
         {
             Chunk = Chunks[chunkPosition.Xz],
-            DistanceFromCamera = Vector2.Distance(cameraPosition.Xz, Chunks[chunkPosition.Xz].Position.Xz)
+            DistanceFromCamera = Vector2.DistanceSquared(cameraPosition.Xz, Chunks[chunkPosition.Xz].Position.Xz)
         });
     }
     

@@ -25,11 +25,11 @@ public static class TerrainGenerator
                 var height = mountains + hills * flatness;
         
                 if (y < 57 + height)
-                    chunk.Blocks[x, y, z] = BlockType.Stone;
+                    chunk.Blocks[x, y, z].Type = BlockType.Sand;
                 else if (y < 60 + height)
-                    chunk.Blocks[x, y, z] = BlockType.Dirt;
+                    chunk.Blocks[x, y, z].Type = BlockType.Dirt;
                 else if (y < 61 + height)
-                    chunk.Blocks[x, y, z] = BlockType.Grass;
+                    chunk.Blocks[x, y, z].Type = BlockType.Grass;
                 else
                     chunk.Blocks[x, y, z] = chunk.Blocks[x, y, z];
             }
@@ -58,7 +58,7 @@ public static class TerrainGenerator
 
                 if (Math.Abs(density - 0.5) < 0.2)
                 {
-                    chunk.Blocks[x, y, z] = BlockType.Air;
+                    chunk.Blocks[x, y, z].Type = BlockType.Air;
                 }
             }
             
@@ -78,7 +78,7 @@ public static class TerrainGenerator
 
                     if (y < 50 && Math.Abs(density - 0.5) < 0.2f)
                     {
-                        chunk.Blocks[x, y, z] = BlockType.Air;
+                        chunk.Blocks[x, y, z].Type = BlockType.Air;
                     }
                 }
             }
@@ -88,9 +88,9 @@ public static class TerrainGenerator
             for (int z = 0; z < Chunk.Dimensions.Z; z++)
             for (int y = Chunk.Dimensions.Y - 2; y >= 0; y--)
             {
-                if (chunk.Blocks[x, y, z] == BlockType.Dirt && chunk.Blocks[x, y + 1, z] == BlockType.Air)
+                if (chunk.Blocks[x, y, z].Type == BlockType.Dirt && chunk.Blocks[x, y + 1, z].Type == BlockType.Air)
                 {
-                    chunk.Blocks[x, y, z] = BlockType.Grass;
+                    chunk.Blocks[x, y, z].Type = BlockType.Grass;
                 }
             }
             
@@ -112,7 +112,7 @@ public static class TerrainGenerator
                 
                 var treeSize = rng.Next(3, 8);
 
-                var isGrass = chunk.Blocks[rx, ry, rz] == BlockType.Grass;
+                var isGrass = chunk.Blocks[rx, ry, rz].Type == BlockType.Grass;
         
                 if (isGrass && treeGradient < 0.0 && ry > 0 && ry + treeSize + 1 < Chunk.Dimensions.Y)
                 {
@@ -120,23 +120,23 @@ public static class TerrainGenerator
             
                     for (var i = ry; i < ry + treeSize; i++)
                     {
-                        chunk.Blocks[rx, i, rz] = BlockType.Tree;
+                        chunk.Blocks[rx, i, rz].Type = BlockType.Tree;
                     }
             
-                    chunk.Blocks[rx, ry + treeSize, rz] = BlockType.Leaves;
+                    chunk.Blocks[rx, ry + treeSize, rz].Type = BlockType.Leaves;
 
                     var treeLeafRef = chunk.GetBlockRef(rx, ry + treeSize, rz);
                     
                     List<BlockRef> extraLeaves = [];
 
-                    foreach (var neighbour in treeLeafRef.GetNeighbours())
+                    foreach (var neighbour in treeLeafRef.GetNeighbours9X9())
                     {
                         if (neighbour.IsAir)
                         {
                             neighbour.SetBlockType(BlockType.Leaves);    
                         }
                         
-                        extraLeaves.AddRange(neighbour.GetNeighbours());
+                        extraLeaves.AddRange(neighbour.GetNeighbours9X9());
                     }
 
                     foreach (var leaf in extraLeaves.Where(leave => leave.IsAir))
@@ -150,6 +150,39 @@ public static class TerrainGenerator
                 }
             }
             
+            // Light
+            // Queue<BlockRef> lightFrontier = new Queue<BlockRef>();
+            
+            for (int x = 0; x < Chunk.Dimensions.X; x++)
+            for (int z = 0; z < Chunk.Dimensions.Z; z++)
+            for (int y = Chunk.Dimensions.Y - 1; y >= 0; y--)
+            {
+                var block = chunk.Blocks[x, y, z];
+
+                if (block.Type == BlockType.Air)
+                {
+                    chunk.Blocks[x, y, z].LightLevel = 15;
+                    // lightFrontier.Enqueue(blockRef);
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            // while (lightFrontier.TryDequeue(out var blockRef))
+            // {
+            //     foreach (var neighbour in blockRef.GetNeighboursOnSameY().Where(n => n.IsAir))
+            //     {
+            //         if (neighbour.Block.LightLevel < blockRef.Block.LightLevel - 1)
+            //         {
+            //             neighbour.SetLightLevel(blockRef.Block.LightLevel - 1);
+            //             lightFrontier.Enqueue(neighbour);
+            //         }
+            //     }
+            // }
+
+
             // // Invert solids to see the caverns.
             // for (int x = 0; x < Chunk.Dimensions.X; x++)
             // for (int z = 0; z < Chunk.Dimensions.Z; z++)

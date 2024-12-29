@@ -30,8 +30,15 @@ public class ChunkGenerator
                 {
                     Task.Run(() =>
                     {
-                        TerrainGenerator.GenerateChunk(chunk, _world);
-                        chunk.UpdateMesh(_world);
+                        try
+                        {
+                            TerrainGenerator.GenerateChunk(chunk, _world);
+                            chunk.UpdateMesh(_world);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"ERROR: {ex}");                            
+                        }
 
                     }, _cancellationToken);
                 }

@@ -5,6 +5,7 @@ out vec4 FragColor;
 in vec3 fragPos;
 in vec3 normal;
 in vec2 texCoord;
+in float lightLevel;
 
 uniform sampler2D texture0;
 uniform vec3 camPos;
@@ -29,8 +30,9 @@ void main()
     float lambert = max(dot(normal, lightPos), 0.8);
     float d = distance(camPos, fragPos);
     float fogFactor = linearFog(d, fogNear, fogFar);
+    // color *= vec4(lambert, lambert, lambert, 1.0);
+    vec3 light = vec3(lightLevel * 0.7 + 0.3);
+    color *= vec4(light, opacity);
     color = mix(color, fogColor, fogFactor);
-    color *= vec4(lambert, lambert, lambert, 1.0);
-    color *= vec4(1.0, 1.0, 1.0, opacity);
     FragColor = color; 
 }
