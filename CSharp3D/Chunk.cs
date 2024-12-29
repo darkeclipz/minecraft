@@ -5,22 +5,20 @@ namespace CSharp3D;
 
 public class Chunk
 {
-    public Vector3 Position { get; set; }
+    public Vector3 Position { get; init; }
     
-    public static Vector3i Dimensions = new (16, 384, 16);
+    public static Vector3i Dimensions => new (16, 384, 16);
 
-    public BlockType[,,] Blocks { get; set; }
+    public BlockType[,,] Blocks { get; set; } = new BlockType[Dimensions.X, Dimensions.Y, Dimensions.Z];
 
-    public Mesh Mesh;
+    public Mesh? Mesh { get; private set; } = new();
 
-    public Chunk()
-    {
-        Blocks = new BlockType[Dimensions.X, Dimensions.Y, Dimensions.Z];
-    }
+    public bool IsLoaded { get; private set; } = false;
 
     public void UpdateMesh(World world)
     {
         Mesh = Mesh.From(this, world);
+        IsLoaded = true;
     }
     
     public bool IsSolid(int x, int y, int z)

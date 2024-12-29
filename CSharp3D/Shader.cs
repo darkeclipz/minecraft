@@ -88,6 +88,12 @@ public class Shader : IDisposable
         GL.UniformMatrix4f(loc, 1, true, ref matrix);
     }
 
+    public void SetVector3(string name, Vector3 vector)
+    {
+        var loc = GetUniformLocation(name);
+        GL.Uniform3f(loc, vector.X, vector.Y, vector.Z);
+    }
+
     protected virtual void Dispose(bool disposing)
     {
         if (!disposing) return;

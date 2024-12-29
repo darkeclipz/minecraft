@@ -1,6 +1,8 @@
 ﻿using System.Diagnostics;
+using System.Reflection.Metadata.Ecma335;
 using CSharp3D;
 using OpenTK.Graphics.OpenGLES2;
+using OpenTK.Graphics.Vulkan;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
@@ -25,6 +27,9 @@ public class Game : GameWindow
     private Texture _texture;
 
     private readonly Stopwatch _timer = Stopwatch.StartNew();
+
+    private readonly System.Timers.Timer _fpsTimer = new();
+    private int _frameCount = 0;
 
     private Camera _camera;
 
@@ -105,6 +110,18 @@ public class Game : GameWindow
         Console.WriteLine("Initializing game.");
         _width = width;
         _height = height;
+        
+        _fpsTimer.AutoReset = true;
+        _fpsTimer.Interval = 10_000;
+
+        _fpsTimer.Elapsed += (_, _) =>
+        {
+            var averageFramesPerSecond = _frameCount / 10d;
+            Console.WriteLine($"Avg FPS: {averageFramesPerSecond}");
+            _frameCount = 0;
+        };
+        
+        _fpsTimer.Start();
     }
 
     protected override void OnRenderFrame(FrameEventArgs e)
@@ -115,6 +132,10 @@ public class Game : GameWindow
         
         foreach (var chunk in _world.Chunks)
         {
+            if (!chunk.IsLoaded) continue;
+            
+            chunk.Mesh.Use();
+            
             GL.BindVertexArray(chunk.Mesh.VertexArrayObject);
             GL.DrawArrays(PrimitiveType.Triangles, 0, chunk.Mesh.Vertices.Length / 8);    
         }
@@ -122,6 +143,8 @@ public class Game : GameWindow
         // GL.DrawElements(PrimitiveType.Triangles, _indices.Length, DrawElementsType.UnsignedInt, 0);
         
         SwapBuffers();
+
+        _frameCount++;
     }
 
     protected override void OnMouseMove(MouseMoveEventArgs e)
@@ -206,13 +229,15 @@ public class Game : GameWindow
         var cameraFrontZ = (float)Math.Cos(MathHelper.DegreesToRadians(_camera.Pitch)) * (float)Math.Sin(MathHelper.DegreesToRadians(_camera.Yaw));
         _camera.Front = Vector3.Normalize(new Vector3(cameraFrontX, cameraFrontY, cameraFrontZ));
 
+        _shader.SetVector3("camPos", _camera.Position);
+
         // Update the model.
-        var time = (float)_timer.Elapsed.TotalSeconds;
-        var rotX = Matrix4.CreateRotationX(MathHelper.DegreesToRadians(0));
-        var rotZ = Matrix4.CreateRotationZ(0);
-        var rotation = rotX * rotZ;
-        
-        _shader.SetMatrix4("model", ref rotation);
+        // var time = (float)_timer.Elapsed.TotalSeconds;
+        // var rotX = Matrix4.CreateRotationX(MathHelper.DegreesToRadians(0));
+        // var rotZ = Matrix4.CreateRotationZ(0);
+        // var rotation = rotX * rotZ;
+        //
+        // _shader.SetMatrix4("model", ref rotation);
         
         // var blockIdLoc = _shader.GetUniformLocation("blockId");
         // const int numberOfBlocks = 11;
@@ -223,6 +248,19 @@ public class Game : GameWindow
         // Update the camera.
         Matrix4 view = _camera.GetViewMatrix();
         _shader.SetMatrix4("view", ref view);
+        
+        LimitFps(dt);
+    }
+
+    void LimitFps(double deltaTime)
+    {
+        const int maxFramesPerSecond = 60;
+        var millisecondsLeftInWindow = (int)(1000d / maxFramesPerSecond - deltaTime);
+        
+        if (millisecondsLeftInWindow > 0)
+        {
+            Thread.Sleep(millisecondsLeftInWindow);
+        }
     }
 
     protected override void OnFramebufferResize(FramebufferResizeEventArgs e)
@@ -244,7 +282,7 @@ public class Game : GameWindow
         GL.ClearColor(135f / 255f, 206f / 255f, 245f / 255f, 1f);
         
         Console.WriteLine("Generating world...");
-        _world = new World(renderDistance: 3);
+        _world = new World(renderDistance: 30);
 
         // _vertices = _chunk.Mesh.Vertices;
 
@@ -279,13 +317,14 @@ public class Game : GameWindow
 
         _camera = new Camera
         {
-            Position = new Vector3(0, 65, 0),
+            Position = new Vector3(-20, 115, -20),
             Yaw = 45f,
+            Pitch = -15f,
         };
 
-        Matrix4 model = Matrix4.CreateRotationX(MathHelper.DegreesToRadians(0f));
+        Matrix4 model = Matrix4.CreateRotationX(0f);
         Matrix4 view = _camera.GetViewMatrix();
-        Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45.0f), (float)_width / _height, 0.1f, 500.0f);
+        Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45.0f), (float)_width / _height, 0.1f, 1000.0f);
         
         _shader.SetMatrix4("model", ref model);
         _shader.SetMatrix4("view", ref view);
