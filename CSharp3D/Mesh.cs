@@ -188,6 +188,16 @@ public class Mesh
             };
         }
 
+        if (type == BlockType.Tree)
+        {
+            return side switch
+            {
+                Side.Top => BlockType.TreeTop,
+                Side.Bottom => BlockType.TreeTop,
+                _ => BlockType.Tree
+            };
+        }
+
         return type;
     }
 

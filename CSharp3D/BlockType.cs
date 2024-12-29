@@ -10,7 +10,7 @@ public enum BlockType : byte
     Brick = 5,
     Sand = 6,
     Snow = 7,
-    TreeSide = 9,
-    TreeTop = 10,
-    Leaves = 11,
+    Tree = 8,
+    TreeTop = 9,
+    Leaves = 10,
 }

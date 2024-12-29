@@ -8,21 +8,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="cfd5feee-a153-4a1f-b87b-fde73bb04f56" name="Changes" comment=".">
+      <change afterPath="$PROJECT_DIR$/CSharp3D/appsettings.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.CSharp3D/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.CSharp3D/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CSharp3D.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D.sln.DotSettings.user" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CSharp3D/Camera.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/Camera.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CSharp3D/BlockType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/BlockType.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CSharp3D/Chunk.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/Chunk.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CSharp3D/Docs/Ideas.md" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/Docs/Ideas.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CSharp3D/Docs/Resources.md" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/Docs/Resources.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CSharp3D/Mesh.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/Mesh.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CSharp3D/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CSharp3D/Shader.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/Shader.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CSharp3D/Shaders/shader.frag" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/Shaders/shader.frag" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CSharp3D/Shaders/shader.vert" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/Shaders/shader.vert" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CSharp3D/TerrainGenerator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/TerrainGenerator.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CSharp3D/World.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/World.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CSharp3D/bin/Debug/net9.0/CSharp3D.dll" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/bin/Debug/net9.0/CSharp3D.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CSharp3D/bin/Debug/net9.0/CSharp3D.exe" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/bin/Debug/net9.0/CSharp3D.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CSharp3D/bin/Debug/net9.0/CSharp3D.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/bin/Debug/net9.0/CSharp3D.pdb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CSharp3D/bin/Debug/net9.0/Shaders/shader.frag" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/bin/Debug/net9.0/Shaders/shader.frag" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CSharp3D/bin/Debug/net9.0/Shaders/shader.vert" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/bin/Debug/net9.0/Shaders/shader.vert" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CSharp3D/obj/Debug/net9.0/CSharp3D.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/obj/Debug/net9.0/CSharp3D.AssemblyInfo.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CSharp3D/obj/Debug/net9.0/CSharp3D.AssemblyInfoInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/obj/Debug/net9.0/CSharp3D.AssemblyInfoInputs.cache" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CSharp3D/obj/Debug/net9.0/CSharp3D.dll" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/obj/Debug/net9.0/CSharp3D.dll" afterDir="false" />
@@ -46,9 +46,11 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/fc07acd6d8bb40cfb45350f765a2ebd84d6800/a8/29f56d1c/0200081Fpdb19.il" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/c73b3c6c598640c592fd3c6fa226c286e90908/62/1fb63ed0/IDisposable.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/329fe49ed11799a72d6969b94d6c2795786ffda26ab38d38862a1a316824/GL.Overloads.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/356e901355d061ec467328ae269cbf165ffb989756b3994a1e6f68cd96ace6/Keys.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/378f97af0b35589b8be4cfb4f9775d19aef907ca43eefc9138f8136f081f5e5/GameWindow.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/4587d1c2e07e6296135a27f224b12432369b6f6e55d855c6555793a19fdac3/GL.Native.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/535067d9bcdb8ca97e9abf667b10e44ca5cd4adcdcaa41b74af6a6204295ac3/Matrix4.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/5dbdb0f7e2a4b4d51d68e8aeef484d83815a496f76bab3d11c7bce7af73efe/GameWindowSettings.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/9823fe3cbd4448effa6ee366a337bb9c6c9123e0734afd44a03e83733979/GL.Pointers.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/acd79d3d22e4b589dbb56cb2c4be2693a86c5f8c2c77dbf52c39be1aa8fe1/NativeWindow.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/e29e4f90bf55c7e3f564e6873b19a222274128ce32d2828c985c4608e167b76/Thread.cs" root0="FORCE_HIGHLIGHTING" />
@@ -115,7 +117,7 @@
       <updated>1734613120878</updated>
       <workItem from="1734613121438" duration="9259000" />
       <workItem from="1734628235943" duration="14296000" />
-      <workItem from="1735391725554" duration="33158000" />
+      <workItem from="1735391725554" duration="37771000" />
     </task>
     <task id="LOCAL-00001" summary="Add git ignore.">
       <option name="closed" value="true" />
@@ -165,7 +167,15 @@
       <option name="project" value="LOCAL" />
       <updated>1735425919226</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary=".">
+      <option name="closed" value="true" />
+      <created>1735433985291</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1735433985291</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

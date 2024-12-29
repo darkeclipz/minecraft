@@ -1,10 +1,12 @@
+using System.Runtime.CompilerServices;
+
 namespace CSharp3D;
 
 public static class TerrainGenerator
 {
     public static void GenerateChunk(Chunk chunk, World world)
     {
-        Console.WriteLine($"Generating chunk {chunk.Position.X}, {chunk.Position.Z}...");
+        // Console.WriteLine($"Generating chunk {chunk.Position.X}, {chunk.Position.Z}...");
 
 
         
@@ -58,5 +60,27 @@ public static class TerrainGenerator
             else
                 chunk.Blocks[x, y, z] = chunk.Blocks[x, y, z];
         }
+
+        var seed = chunk.GetHashCode();
+        var rng = new Random(seed);
+        
+        // Place random tree.
+        var rx = rng.Next(0, Chunk.Dimensions.X);
+        var rz = rng.Next(0, Chunk.Dimensions.Z);
+        var ry = chunk.HeightAt(rx, rz);
+        var treeSize = rng.Next(3, 8);
+
+        if (ry > 0 && ry + treeSize + 1 < Chunk.Dimensions.Y)
+        {
+            ry += 1;
+            
+            for (var i = ry; i < ry + treeSize; i++)
+            {
+                chunk.Blocks[rx, i, rz] = BlockType.Tree;
+            }
+            
+            chunk.Blocks[rx, ry + treeSize, rz] = BlockType.Leaves;
+        }
     }
+
 }

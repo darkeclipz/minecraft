@@ -11,7 +11,7 @@ public class Chunk
 
     public BlockType[,,] Blocks { get; set; } = new BlockType[Dimensions.X, Dimensions.Y, Dimensions.Z];
 
-    public Mesh? Mesh { get; private set; } = new();
+    public Mesh Mesh { get; private set; } = null!;
 
     public bool IsLoaded { get; private set; } = false;
 
@@ -30,5 +30,18 @@ public class Chunk
         var block = Blocks[x, y, z];
 
         return block != BlockType.Air;
+    }
+
+    public int HeightAt(int x, int z)
+    {
+        if (x < 0 || x > Dimensions.X - 1) return 0;
+        if (z < 0 || z > Dimensions.Z - 1) return 0;
+        
+        for (var y = Dimensions.Y - 1; y >= 0; y--)
+        {
+            if (Blocks[x, y, z] != BlockType.Air) return y;
+        }
+
+        return 0;
     }
 }

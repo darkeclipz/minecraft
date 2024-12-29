@@ -16,92 +16,25 @@ game.Run();
 
 public class Game : GameWindow
 {
-    private int _vertexBufferObject;
-
-    private int _vertexArrayObject;
-
-    private int _elementBufferObject;
+    private Camera _camera;
     
     private Shader _shader;
     
+    private World _world;
+    
     private Texture _texture;
-
-    private readonly Stopwatch _timer = Stopwatch.StartNew();
-
+    
     private readonly System.Timers.Timer _fpsTimer = new();
+    
     private int _frameCount = 0;
 
-    private Camera _camera;
+    private int _width = 1;
 
-    private int _width = 800;
-
-    private int _height = 600;
+    private int _height = 1;
 
     private Vector2 _lastMousePosition = Vector2.Zero;
 
     private bool _firstMove = true;
-
-    private Chunk _chunk;
-
-    private World _world;
-    //
-    // private float[] _vertices =
-    // [
-    //     -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-    //     0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-    //     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    //     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    //     -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-    //     -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-    //
-    //     -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    //     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-    //     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-    //     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-    //     -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-    //     -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    //
-    //     -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    //     -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    //     -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    //     -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    //     -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    //     -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    //
-    //     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    //     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    //     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    //     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    //     0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    //     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    //
-    //     -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    //     0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-    //     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-    //     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-    //     -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    //     -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    //
-    //     -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-    //     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    //     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    //     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    //     -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-    //     -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
-    // ];
-    //
-    // private readonly uint[] _indices =
-    // [ 
-    //     0, 1, 3,   // first triangle
-    //     1, 2, 3    // second triangle
-    // ];
-    //
-    // private readonly float[] _texCoords =
-    // [
-    //     0.0f, 0.0f,  // lower-left corner  
-    //     1.0f, 0.0f,  // lower-right corner
-    //     0.5f, 1.0f   // top-center corner
-    // ];
     
     public Game(int width, int height, string title)
         : base(GameWindowSettings.Default, new NativeWindowSettings 
@@ -111,6 +44,11 @@ public class Game : GameWindow
         _width = width;
         _height = height;
         
+        InitFpsCounter();
+    }
+
+    private void InitFpsCounter()
+    {
         _fpsTimer.AutoReset = true;
         _fpsTimer.Interval = 10_000;
 
@@ -140,10 +78,7 @@ public class Game : GameWindow
             GL.DrawArrays(PrimitiveType.Triangles, 0, chunk.Mesh.Vertices.Length / 8);    
         }
         
-        // GL.DrawElements(PrimitiveType.Triangles, _indices.Length, DrawElementsType.UnsignedInt, 0);
-        
         SwapBuffers();
-
         _frameCount++;
     }
 
@@ -269,7 +204,7 @@ public class Game : GameWindow
         _width = e.Width;
         _height = e.Height;
         GL.Viewport(0, 0, e.Width, e.Height);
-        Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45.0f), (float)_width / _height, 0.1f, 100.0f);
+        Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45.0f), (float)_width / _height, 0.1f, 1000.0f);
         _shader.SetMatrix4("projection", ref projection);
         Console.WriteLine($"Resized window to ({e.Width}, {e.Height}).");
     }
@@ -317,7 +252,7 @@ public class Game : GameWindow
 
         _camera = new Camera
         {
-            Position = new Vector3(-20, 115, -20),
+            Position = new Vector3(0, 115, 0),
             Yaw = 45f,
             Pitch = -15f,
         };
@@ -345,8 +280,6 @@ public class Game : GameWindow
         GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
         GL.BindVertexArray(0);
         GL.UseProgram(0);
-        GL.DeleteBuffer(_vertexBufferObject);
-        GL.DeleteVertexArray(_vertexArrayObject);
         _shader.Dispose();
         _texture.Dispose();
         base.OnUnload();

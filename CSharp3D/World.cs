@@ -40,7 +40,7 @@ public class World
         {
             Task.Run(() =>
             {
-                Thread.Sleep(50);
+                Thread.Sleep(20);
                 TerrainGenerator.GenerateChunk(requestedChunk, this);
                 requestedChunk.UpdateMesh(this);
             });

@@ -28,15 +28,15 @@ void main()
     float diff = max(dot(normal, lightDir), 0.0);
     vec3 diffuse = diff * lightColor * (1.0 - ambientStrength);
     
-    vec3 color = texture(texture0, texCoord).xyz;// * (ambient + diffuse);
+    vec4 color = texture(texture0, texCoord); // * (ambient + diffuse);
     float d = distance(camPos, fragPos);
     
-    vec3 fogColor = vec3(135.0 / 255.0, 206. / 255., 245. / 255.);
+    vec4 fogColor = vec4(135.0 / 255.0, 206. / 255., 245. / 255., 1.0);
     
     float fogDensity = 0.008;
-    float fogFactor = linearFog(d, 200.0, 1000.0);
+    float fogFactor = linearFog(d, 100.0, 500.0);
     color = mix(color, fogColor, fogFactor);
     
-    FragColor = vec4(color, 1.0); 
+    FragColor = color; 
     // FragColor = vec4(normal * 0.5 + 0.5, 1.0);
 }
