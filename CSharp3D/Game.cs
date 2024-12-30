@@ -44,7 +44,7 @@ public class Game : GameWindow
 
     private bool _enableFog = true;
 
-    private bool _enableChunkLoader = true;
+    public static bool EnableChunkLoader = true;
 
     private bool _enableLight = true;
 
@@ -91,8 +91,10 @@ public class Game : GameWindow
 
         int loadedChunks = 0;
         const int loadMaxChunksPerPass = 16;
+
+        var chunks = _world.GetChunksSortedByDistanceDescending(_camera.Position);
         
-        foreach (var chunk in _world.GetChunksSortedByDistance(_camera.Position))
+        foreach (var chunk in chunks)
         {
             if (!chunk.IsLoaded) continue;
             if (!chunk.Mesh.IsLoaded) continue;
@@ -103,7 +105,7 @@ public class Game : GameWindow
             GL.DrawArrays(PrimitiveType.Triangles, 0, chunk.Mesh.Vertices.Length / Mesh.VertexBufferCount);
         }
         
-        foreach (var chunk in _world.GetChunksSortedByDistance(_camera.Position))
+        foreach (var chunk in chunks)
         {
             if (!chunk.IsLoaded) continue;
             if (!chunk.Mesh.IsLoaded) continue;
@@ -235,6 +237,11 @@ public class Game : GameWindow
         if (input.IsKeyDown(Keys.W))
         {
             _camera.Position += _camera.Front * _camera.Speed * dt * sprint;
+            // _camera.Velocity = _camera.Front * _camera.Speed;
+        }
+        else
+        {
+            // _camera.Velocity = Vector3.Zero;
         }
 
         if (input.IsKeyDown(Keys.S))
@@ -255,6 +262,7 @@ public class Game : GameWindow
         if (input.IsKeyDown(Keys.Space))
         {
             _camera.Position += _camera.Up * _camera.Speed * dt * sprint;
+            _camera.Velocity += new Vector3(0, 10f, 0);
         }
 
         if (input.IsKeyDown(Keys.LeftControl))
@@ -311,7 +319,7 @@ public class Game : GameWindow
         bool tooFarFromCurrentChunk = Vector2.DistanceSquared(_camera.Position.Xz, _world.CurrentChunk.Position.Xz) >
                                       World.UpdateDistanceThreshold * World.UpdateDistanceThreshold;
         
-        if (_enableChunkLoader && tooFarFromCurrentChunk)
+        if (EnableChunkLoader && tooFarFromCurrentChunk)
         {
             Stopwatch sw = Stopwatch.StartNew();
             var nearestChunk = _world.GetNearestChunk(_camera.Position.Xz);
@@ -344,6 +352,14 @@ public class Game : GameWindow
                 loadedChunks++;
             }
         }
+        
+        // Physics
+        // _camera.Acceleration += World.Gravity;
+
+        // _camera.Velocity += World.Gravity;
+        // _camera.Position += _camera.Velocity * dt;
+        
+        
         
         LimitFps(dt);
     }
@@ -466,7 +482,7 @@ public class Game : GameWindow
 
     private void ToggleChunkLoader()
     {
-        _enableChunkLoader = !_enableChunkLoader;
+        EnableChunkLoader = !EnableChunkLoader;
     }
 
     private void SetRenderDistance(int dist)

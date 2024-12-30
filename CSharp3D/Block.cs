@@ -15,6 +15,8 @@ public struct Block
         BlockType.Flower2 => false,
         BlockType.Flower3 => false,
         BlockType.Flower4 => false,
+        BlockType.BigPlantBottom => false,
+        BlockType.BigPlantTop => false,
         _ => true
     };
 
@@ -24,6 +26,8 @@ public struct Block
         BlockType.Flower2 => true,
         BlockType.Flower3 => true,
         BlockType.Flower4 => true,
+        BlockType.BigPlantBottom => true,
+        BlockType.BigPlantTop => true,
         _ => false
     };
 }

@@ -23,4 +23,6 @@ public enum BlockType : byte
     IronOre = 18,
     CoalOre = 19,
     DiamondOre = 20,
+    BigPlantTop = 21,
+    BigPlantBottom = 22,
 }

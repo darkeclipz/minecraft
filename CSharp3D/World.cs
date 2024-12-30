@@ -23,6 +23,8 @@ public class World
     private Task _chunkUnloader;
 
     public const int UpdateDistanceThreshold = 20;
+    
+    public static readonly Vector3 Gravity = new Vector3(0f, -9.8f, 0f);
 
     public World(Camera camera)
     {
@@ -79,10 +81,7 @@ public class World
 
         CurrentChunk = newChunk;
 
-
-
         DispatchGenerationRequests();
-
     }
 
     private void ChunkUnloader()
@@ -91,13 +90,16 @@ public class World
         {
             try
             {
-                var maxDistance = (_camera.RenderDistance + 3) * Chunk.Dimensions.X;
-
-                foreach (var chunk in Chunks.Values.ToList())
+                if (Game.EnableChunkLoader)
                 {
-                    if (Vector2.DistanceSquared(_camera.Position.Xz, chunk.Midpoint.Xz) > maxDistance * maxDistance)
+                    var maxDistance = (_camera.RenderDistance + 3) * Chunk.Dimensions.X;
+
+                    foreach (var chunk in Chunks.Values.ToList())
                     {
-                        UnloadChunk(chunk);
+                        if (Vector2.DistanceSquared(_camera.Position.Xz, chunk.Midpoint.Xz) > maxDistance * maxDistance)
+                        {
+                            UnloadChunk(chunk);
+                        }
                     }
                 }
 
@@ -128,8 +130,21 @@ public class World
 
         return nearestChunk;
     }
-
+    
     public IEnumerable<Chunk> GetChunksSortedByDistance(Vector3 position)
+    {
+        List<(float, Chunk)> sortedChunks = new();
+
+        foreach (var chunk in Chunks.Values)
+        {
+            var distance = Vector2.DistanceSquared(chunk.Midpoint.Xz, position.Xz);
+            sortedChunks.Add((distance, chunk));
+        }
+        
+        return sortedChunks.OrderBy(sc => sc.Item1).Select(sc => sc.Item2);
+    }
+
+    public IEnumerable<Chunk> GetChunksSortedByDistanceDescending(Vector3 position)
     {
         List<(float, Chunk)> sortedChunks = new();
 
@@ -161,7 +176,7 @@ public class World
         _chunkBackgroundWorker.Clear();
         _meshBackgroundWorker.Clear();
         
-        foreach (var chunk in Chunks.Values)
+        foreach (var chunk in GetChunksSortedByDistance(_camera.Position))
         {
             _chunkBackgroundWorker.DispatchChunk(chunk);
         }
@@ -263,7 +278,8 @@ public class World
     {
         foreach (var requestedChunk in _chunkGenerationRequests
                      .OrderBy(gr => gr.DistanceFromCamera)
-                     .Select(gr => gr.Chunk))
+                     .Select(gr => gr.Chunk)
+                     .ToList())
         {
             _chunkBackgroundWorker.DispatchChunk(requestedChunk);
         }

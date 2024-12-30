@@ -8,25 +8,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="cfd5feee-a153-4a1f-b87b-fde73bb04f56" name="Changes" comment=".">
-      <change afterPath="$PROJECT_DIR$/CSharp3D/Block.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CSharp3D/Docs/TODO.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.CSharp3D/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.CSharp3D/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CSharp3D/Block.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/Block.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CSharp3D/BlockType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/BlockType.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CSharp3D/Camera.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/Camera.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CSharp3D/Chunk.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/Chunk.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CSharp3D/Game.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/Game.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CSharp3D/Mesh.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/Mesh.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CSharp3D/Shaders/shader.vert" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/Shaders/shader.vert" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CSharp3D/TerrainGenerator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/TerrainGenerator.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CSharp3D/Textures/tile_atlas.png" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/Textures/tile_atlas.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CSharp3D/World.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/World.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CSharp3D/bin/Debug/net9.0/CSharp3D.dll" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/bin/Debug/net9.0/CSharp3D.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CSharp3D/bin/Debug/net9.0/CSharp3D.exe" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/bin/Debug/net9.0/CSharp3D.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CSharp3D/bin/Debug/net9.0/CSharp3D.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/bin/Debug/net9.0/CSharp3D.pdb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CSharp3D/bin/Debug/net9.0/Shaders/shader.vert" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/bin/Debug/net9.0/Shaders/shader.vert" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CSharp3D/bin/Debug/net9.0/Textures/tile_atlas.png" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/bin/Debug/net9.0/Textures/tile_atlas.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CSharp3D/obj/Debug/net9.0/CSharp3D.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/obj/Debug/net9.0/CSharp3D.AssemblyInfo.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CSharp3D/obj/Debug/net9.0/CSharp3D.AssemblyInfoInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/obj/Debug/net9.0/CSharp3D.AssemblyInfoInputs.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CSharp3D/obj/Debug/net9.0/CSharp3D.csproj.CoreCompileInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/obj/Debug/net9.0/CSharp3D.csproj.CoreCompileInputs.cache" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CSharp3D/obj/Debug/net9.0/CSharp3D.dll" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/obj/Debug/net9.0/CSharp3D.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CSharp3D/obj/Debug/net9.0/CSharp3D.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/obj/Debug/net9.0/CSharp3D.pdb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CSharp3D/obj/Debug/net9.0/apphost.exe" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/obj/Debug/net9.0/apphost.exe" afterDir="false" />
@@ -76,7 +72,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    ".NET Project.CSharp3D.executor": "Debug",
+    ".NET Project.CSharp3D.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "git-widget-placeholder": "master",
@@ -126,7 +122,7 @@
       <workItem from="1734628235943" duration="14296000" />
       <workItem from="1735391725554" duration="78201000" />
       <workItem from="1735557161556" duration="698000" />
-      <workItem from="1735557868786" duration="34488000" />
+      <workItem from="1735557868786" duration="39773000" />
     </task>
     <task id="LOCAL-00001" summary="Add git ignore.">
       <option name="closed" value="true" />
@@ -256,7 +252,15 @@
       <option name="project" value="LOCAL" />
       <updated>1735581655406</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary=".">
+      <option name="closed" value="true" />
+      <created>1735597039803</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1735597039803</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

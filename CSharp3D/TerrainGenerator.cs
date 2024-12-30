@@ -263,7 +263,7 @@ public static class TerrainGenerator
 
                                 foreach (var neighbour in neighbours)
                                 {
-                                    if (neighbour.Block.Type == BlockType.Stone && rng.NextDouble() < 0.035)
+                                    if (neighbour.Block.Type == BlockType.Stone && rng.NextDouble() < 0.045)
                                     {
                                         frontier.Enqueue(neighbour);
                                     }
@@ -334,9 +334,16 @@ public static class TerrainGenerator
                 
                     var isGrass = chunk.Blocks[x, ry, z].Type == BlockType.Grass;
  
-                    if (ry < Chunk.Dimensions.Y && isGrass && rng.NextDouble()< 0.01)
+                    if (ry < Chunk.Dimensions.Y - 1 && isGrass && rng.NextDouble()< 0.01)
                     {
-                        chunk.Blocks[x, ry + 1, z].Type = GetRandomFlower(rng);
+                        var flowerType = GetRandomFlower(rng);
+
+                        chunk.Blocks[x, ry + 1, z].Type = flowerType;
+
+                        if (flowerType == BlockType.BigPlantBottom)
+                        {
+                            chunk.Blocks[x, ry + 2, z].Type = BlockType.BigPlantTop;
+                        }
                     }
                 }
             }
@@ -350,10 +357,7 @@ public static class TerrainGenerator
 
                 if (!Block.IsSolid(block.Type))
                 {
-                    if (!Block.IsPlant(chunk.Blocks[x, y, z].Type))
-                    {
-                        chunk.Blocks[x, y, z].LightLevel = 15; 
-                    }
+                    chunk.Blocks[x, y, z].LightLevel = 15; 
                 }
                 else
                 {
@@ -398,6 +402,7 @@ public static class TerrainGenerator
             if (p < 0.15) return BlockType.Flower3;
             if (p < 0.30) return BlockType.Flower4;
             if (p < 0.40) return BlockType.Flower1;
+            if (p < 0.43) return BlockType.BigPlantBottom;
             return BlockType.Flower2;
         }
 
