@@ -1,4 +1,5 @@
 using System.Net.Http.Headers;
+using System.Net.Mime;
 using System.Reflection.Metadata.Ecma335;
 using System.Runtime.CompilerServices;
 using OpenTK.Mathematics;
@@ -13,28 +14,31 @@ public class World
     
     private List<ChunkGenerationRequest> _chunkGenerationRequests = [];
     
-    private ChunkGenerator _chunkGenerator;
+    private Camera _camera;
     
-    public readonly int RenderDistance;
+    private ChunkGenerator _chunkGenerator;
+
+    private MeshGenerator _meshGenerator;
 
     public const int UpdateDistanceThreshold = 20;
 
     public World(Camera camera)
     {
-        RenderDistance = camera.RenderDistance;
-        _chunkGenerator = new ChunkGenerator(camera, this, Game.CancellationToken);
-        Initialize(camera);
+        _camera = camera;
+        _meshGenerator = new MeshGenerator(camera, this, Game.CancellationToken);
+        _chunkGenerator = new ChunkGenerator(camera, this, _meshGenerator, Game.CancellationToken);
+        Initialize();
     }
 
-    public void Initialize(Camera camera)
+    public void Initialize()
     {
-        var x = ((int)camera.Position.X / Chunk.Dimensions.X) * Chunk.Dimensions.X;
-        var z = ((int)camera.Position.Z / Chunk.Dimensions.Z) * Chunk.Dimensions.Z;
+        var x = ((int)_camera.Position.X / Chunk.Dimensions.X) * Chunk.Dimensions.X;
+        var z = ((int)_camera.Position.Z / Chunk.Dimensions.Z) * Chunk.Dimensions.Z;
         var origin = new Vector3(x, 0, z);
         
-        foreach (var point in GetPointsAroundChunkWithinRenderDistance(origin, RenderDistance))
+        foreach (var point in GetPointsAroundChunkWithinRenderDistance(origin, _camera.RenderDistance))
         {
-            LoadChunk(camera.Position, point);
+            LoadChunk(_camera.Position, point);
         }
 
         CurrentChunk = Chunks.Values.First();
@@ -45,14 +49,14 @@ public class World
     public bool IsChunkInRenderDistance(Vector3 cameraPosition, Vector3 chunkMidpoint)
     {
         var distance = Vector2.Distance(cameraPosition.Xz, chunkMidpoint.Xz) / Chunk.Dimensions.X;
-        return distance < RenderDistance + 1;
+        return distance < _camera.RenderDistance + 1;
     }
 
     public void UpdateCurrentChunk(Vector3 cameraPosition, Chunk newChunk, bool forceUpdate = false)
     {
         if (CurrentChunk == newChunk && !forceUpdate) return;
 
-        var chunkPositionsAroundPlayer = GetPointsAroundChunkWithinRenderDistance(newChunk.Position, RenderDistance).ToList();
+        var chunkPositionsAroundPlayer = GetPointsAroundChunkWithinRenderDistance(newChunk.Position, _camera.RenderDistance).ToList();
 
         foreach (var chunkPosition in chunkPositionsAroundPlayer)
         {
@@ -114,7 +118,7 @@ public class World
         return sortedChunks.OrderBy(sc => sc.Item1).Select(sc => sc.Item2);
     }
 
-    public void Reset(Camera camera)
+    public void Reset()
     {
         foreach (var chunk in Chunks.Values.ToList())
         {
@@ -124,7 +128,7 @@ public class World
         Chunks.Clear();
         _chunkGenerator.Clear();
 
-        Initialize(camera);
+        Initialize();
     }
 
     public BlockRef? GetBlockOrNull(Vector3 worldPos)
@@ -149,13 +153,74 @@ public class World
 
     private void LoadChunk(Vector3 cameraPosition, Vector3 chunkPosition)
     {
-        Chunks[chunkPosition.Xz] = new Chunk(chunkPosition, this);
-            
-        _chunkGenerationRequests.Add(new ChunkGenerationRequest
+        var chunk = new Chunk(chunkPosition, this);
+        Chunks[chunkPosition.Xz] = chunk;
+        LinkNeighbours(chunk);
+        var distanceFromCamera = Vector2.DistanceSquared(cameraPosition.Xz, chunk.Position.Xz);
+        var chunkGenerationRequest = new ChunkGenerationRequest(chunk, distanceFromCamera);
+        _chunkGenerationRequests.Add(chunkGenerationRequest);
+    }
+
+    private void LinkNeighbours(Chunk chunk)
+    {
+        if (Chunks.TryGetValue(chunk.Position.Xz + Vector2.UnitX * Chunk.Dimensions.X, out var right))
         {
-            Chunk = Chunks[chunkPosition.Xz],
-            DistanceFromCamera = Vector2.DistanceSquared(cameraPosition.Xz, Chunks[chunkPosition.Xz].Position.Xz)
-        });
+            chunk.Right = right;
+            right.Left = chunk;
+            
+            _meshGenerator.DispatchChunk(right);
+        }
+        
+        if (Chunks.TryGetValue(chunk.Position.Xz - Vector2.UnitX * Chunk.Dimensions.X, out var left))
+        {
+            chunk.Left = left;
+            left.Right = chunk;
+            
+            _meshGenerator.DispatchChunk(left);
+        }
+
+        if (Chunks.TryGetValue(chunk.Position.Xz + Vector2.UnitY * Chunk.Dimensions.Z, out var front))
+        {
+            chunk.Front = front;
+            front.Back = chunk;
+            
+            _meshGenerator.DispatchChunk(front);
+        }
+        
+        if (Chunks.TryGetValue(chunk.Position.Xz - Vector2.UnitY * Chunk.Dimensions.Z, out var back))
+        {
+            chunk.Back = back;
+            back.Front = chunk;
+            
+            _meshGenerator.DispatchChunk(back);
+        }
+    }
+
+    private void UnlinkNeighbours(Chunk chunk)
+    {
+        if (chunk.Left is not null)
+        {
+            chunk.Left.Right = null;
+            chunk.Left = null;    
+        }
+
+        if (chunk.Right is not null)
+        {
+            chunk.Right.Left = null;
+            chunk.Right = null;
+        }
+
+        if (chunk.Front is not null)
+        {
+            chunk.Front.Back = null;
+            chunk.Front = null;
+        }
+
+        if (chunk.Back is not null)
+        {
+            chunk.Back.Front = null;
+            chunk.Back = null;
+        }
     }
     
     private void DispatchGenerationRequests()
@@ -172,6 +237,7 @@ public class World
 
     private void UnloadChunk(Chunk chunk)
     {
+        UnlinkNeighbours(chunk);
         Chunks.Remove(chunk.Position.Xz);
         chunk.Dispose();
     }
@@ -190,4 +256,6 @@ public class World
             yield return new Vector3(chunkX, 0, chunkZ);
         }
     }
+    
+    record ChunkGenerationRequest(Chunk Chunk, float DistanceFromCamera);
 }

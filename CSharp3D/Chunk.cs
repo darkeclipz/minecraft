@@ -6,8 +6,8 @@ namespace CSharp3D;
 
 public struct Block
 {
-    public BlockType Type { get; set; }
-    public int LightLevel { get; set; }
+    public BlockType Type;
+    public int LightLevel;
     
     public static Block LitAir = new Block { Type = BlockType.Air, LightLevel = 15 };
     public static Block UnlitAir = new Block { Type = BlockType.Air, LightLevel = 0 };
@@ -17,7 +17,7 @@ public class Chunk : IDisposable
 {
     public Vector3 Position { get; }
     
-    public static Vector3i Dimensions => new (16, 384, 16);
+    public static readonly Vector3i Dimensions = new (16, 384, 16);
 
     public Block[,,] Blocks { get; set; } = new Block[Dimensions.X, Dimensions.Y, Dimensions.Z];
 
@@ -30,6 +30,16 @@ public class Chunk : IDisposable
     public DateTimeOffset CreatedAt { get; private set; } = DateTimeOffset.Now;
 
     private World _world;
+
+    public Chunk? Front { get; set; }
+    
+    public Chunk? Back { get; set; }
+    
+    public Chunk? Left { get; set; }
+    
+    public Chunk? Right { get; set; }
+    
+    public bool HasNeighbours => !(Front is null || Back is null || Left is null || Right is null);
 
     public Chunk(Vector3 position, World world)
     {
@@ -53,9 +63,31 @@ public class Chunk : IDisposable
     
     public bool IsSolid(int x, int y, int z)
     {
-        if (x < 0 || x > Dimensions.X - 1) return false;
         if (y < 0 || y > Dimensions.Y - 1) return false;
-        if (z < 0 || z > Dimensions.Z - 1) return false;
+        
+        if (x < 0)
+        {
+            if (Left is null) return false;
+            return Left.IsSolid(x + Dimensions.X, y, z);
+        }
+
+        if (x >= Dimensions.X)
+        {
+            if (Right is null) return false;
+            return Right.IsSolid(x - Dimensions.X, y, z);
+        }
+
+        if (z < 0)
+        {
+            if (Back is null) return false;
+            return Back.IsSolid(x, y, z + Dimensions.Z);
+        }
+
+        if (z >= Dimensions.Z)
+        {
+            if (Front is null) return false;
+            return Front.IsSolid(x, y, z - Dimensions.Z);
+        }
         
         var block = Blocks[x, y, z];
 

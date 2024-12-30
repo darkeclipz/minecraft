@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using CSharp3D;
+using Microsoft.Extensions.Configuration;
 using OpenTK.Graphics.OpenGLES2;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
@@ -10,7 +11,11 @@ public class Game : GameWindow
 {
     private Camera _camera;
     
-    private Shader _shader;
+    private Shader _defaultShader;
+
+    private Shader _wireframeShader;
+
+    private Shader _activeShader;
     
     private World _world;
     
@@ -33,14 +38,23 @@ public class Game : GameWindow
     public static readonly int WorldSeed = (int)Random.Shared.NextInt64();
     
     public static CancellationToken CancellationToken { get; private set; }
+
+    private IConfiguration _configuration;
+
+    private bool _enableFog = true;
+
+    private bool _enableChunkLoader = true;
+
+    private bool _enableLight = true;
     
-    public Game(int width, int height, string title)
+    public Game(int width, int height, IConfiguration configuration)
         : base(GameWindowSettings.Default, new NativeWindowSettings 
             { ClientSize = (width, height) })
     {
         Console.WriteLine("Initializing game.");
         _width = width;
         _height = height;
+        _configuration = configuration;
         
         InitFpsCounter();
         
@@ -66,7 +80,7 @@ public class Game : GameWindow
     {
         base.OnRenderFrame(e);
         GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-        _shader.Use();
+        _activeShader.Use();
 
         int loadedChunks = 0;
         const int loadMaxChunksPerPass = 3;
@@ -83,7 +97,7 @@ public class Game : GameWindow
 
             if (!chunk.Mesh.IsLoaded) continue;
             
-            _shader.SetFloat("opacity", chunk.GetOpacity());
+            _activeShader.SetFloat("opacity", chunk.GetOpacity());
             
             GL.BindVertexArray(chunk.Mesh.VertexArrayObject);
             GL.DrawArrays(PrimitiveType.Triangles, 0, chunk.Mesh.Vertices.Length / Mesh.VertexBufferCount);    
@@ -123,7 +137,82 @@ public class Game : GameWindow
 
         if (input.IsKeyReleased(Keys.R))
         {
-            _world.Reset(_camera);
+            _world.Reset();
+        }
+
+        if (input.IsKeyReleased(Keys.C))
+        {
+            ToggleChunkLoader();
+        }
+
+        if (input.IsKeyReleased(Keys.L))
+        {
+            ToggleLight();
+        }
+
+        if (input.IsKeyReleased(Keys.F1))
+        {
+            UseDefaultShader();
+        }
+        
+        if (input.IsKeyReleased(Keys.F2))
+        {
+            UseWireframeShader();
+        }
+
+        if (input.IsKeyReleased(Keys.D0))
+        {
+            SetRenderDistance(0);
+        }
+        
+        if (input.IsKeyReleased(Keys.D1))
+        {
+            SetRenderDistance(1);
+        }
+        
+        if (input.IsKeyReleased(Keys.D2))
+        {
+            SetRenderDistance(3);
+        }
+        
+        if (input.IsKeyReleased(Keys.D3))
+        {
+            SetRenderDistance(5);
+        }
+        
+        if (input.IsKeyReleased(Keys.D4))
+        {
+            SetRenderDistance(8);
+        }
+        
+        if (input.IsKeyReleased(Keys.D5))
+        {
+            SetRenderDistance(11);
+        }
+        
+        if (input.IsKeyReleased(Keys.D6))
+        {
+            SetRenderDistance(14);
+        }
+        
+        if (input.IsKeyReleased(Keys.D7))
+        {
+            SetRenderDistance(17);
+        }
+        
+        if (input.IsKeyReleased(Keys.D8))
+        {
+            SetRenderDistance(20);
+        }
+        
+        if (input.IsKeyReleased(Keys.D9))
+        {
+            SetRenderDistance(25);
+        }
+
+        if (input.IsKeyReleased(Keys.F))
+        {
+            ToggleFog();
         }
 
         if (input.IsKeyDown(Keys.W))
@@ -181,7 +270,7 @@ public class Game : GameWindow
         var cameraFrontZ = (float)Math.Cos(MathHelper.DegreesToRadians(_camera.Pitch)) * (float)Math.Sin(MathHelper.DegreesToRadians(_camera.Yaw));
         _camera.Front = Vector3.Normalize(new Vector3(cameraFrontX, cameraFrontY, cameraFrontZ));
 
-        _shader.SetVector3("camPos", _camera.Position);
+        _activeShader.SetVector3("camPos", _camera.Position);
 
         // Update the model.
         // var time = (float)_timer.Elapsed.TotalSeconds;
@@ -199,10 +288,13 @@ public class Game : GameWindow
         
         // Update the camera.
         Matrix4 view = _camera.GetViewMatrix();
-        _shader.SetMatrix4("view", ref view);
+        _activeShader.SetMatrix4("view", ref view);
         
         // Update world
-        if (Vector2.DistanceSquared(_camera.Position.Xz, _world.CurrentChunk.Position.Xz) > World.UpdateDistanceThreshold * World.UpdateDistanceThreshold)
+        bool tooFarFromCurrentChunk = Vector2.DistanceSquared(_camera.Position.Xz, _world.CurrentChunk.Position.Xz) >
+                                      World.UpdateDistanceThreshold * World.UpdateDistanceThreshold;
+        
+        if (_enableChunkLoader && tooFarFromCurrentChunk)
         {
             Stopwatch sw = Stopwatch.StartNew();
             var nearestChunk = _world.GetNearestChunk(_camera.Position.Xz);
@@ -232,79 +324,115 @@ public class Game : GameWindow
         _height = e.Height;
         GL.Viewport(0, 0, e.Width, e.Height);
         Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45.0f), (float)_width / _height, 0.1f, 1000.0f);
-        _shader.SetMatrix4("projection", ref projection);
+        _defaultShader.SetMatrix4("projection", ref projection);
         Console.WriteLine($"Resized window to ({e.Width}, {e.Height}).");
     }
 
     protected override void OnLoad()
     {
         base.OnLoad();
-        Console.WriteLine("Initializing OpenGL.");
         
         GL.ClearColor(135f / 255f, 206f / 255f, 245f / 255f, 1f);
         
         Console.WriteLine("Generating world...");
-
-        // _vertices = _chunk.Mesh.Vertices;
-
-        // _vertexArrayObject = GL.GenVertexArray();
-        // GL.BindVertexArray(_vertexArrayObject);
-        //
-        // _vertexBufferObject = GL.GenBuffer();
-        // GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBufferObject);
-        // GL.BufferData(BufferTarget.ArrayBuffer, _vertices.Length * sizeof(float), _vertices, BufferUsage.StaticDraw);
-        //
-        // _elementBufferObject = GL.GenBuffer();
-        // GL.BindBuffer(BufferTarget.ElementArrayBuffer, _elementBufferObject);
-        // GL.BufferData(BufferTarget.ElementArrayBuffer, _indices.Length * sizeof(uint), _indices, BufferUsage.StaticDraw);
-        //
-        _shader = new Shader("Shaders/shader.vert", "Shaders/shader.frag");
-        _shader.Use();
-        
-        //
-        // var vertexLocation = _shader.GetAttributeLocation("aPosition");
-        // GL.EnableVertexAttribArray((uint)vertexLocation);
-        // GL.VertexAttribPointer((uint)vertexLocation, 3, VertexAttribPointerType.Float, false, 5 * sizeof(float), 0);
-        //
-        // var texCoordLocation = _shader.GetAttributeLocation("aTexCoord");
-        // GL.EnableVertexAttribArray((uint)texCoordLocation);
-        // GL.VertexAttribPointer((uint)texCoordLocation, 2, VertexAttribPointerType.Float, false, 5 * sizeof(float), 3 * sizeof(float));
-        //
-        // var blockIdLoc = _shader.GetUniformLocation("blockId");
-        // GL.Uniform1i(blockIdLoc, 0);
         
         _texture = new Texture("Textures/tile_atlas.png");
         _texture.Use(TextureUnit.Texture0);
 
-        _camera = new Camera
-        {
-            Position = new Vector3(0, 115, 0),
-            Yaw = 45f,
-            Pitch = -15f,
-            RenderDistance = 25,
-        };
-        
+        _camera = new Camera();
         _world = new World(_camera);
 
+        UseDefaultShader();
+
+        CursorState = CursorState.Grabbed;
+    }
+
+    private void UseDefaultShader()
+    {
+        _defaultShader ??= new Shader("Shaders/shader.vert", "Shaders/shader.frag");
+        _defaultShader.Use();
+        
         Matrix4 model = Matrix4.CreateRotationX(0f);
         Matrix4 view = _camera.GetViewMatrix();
         Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45.0f), (float)_width / _height, 0.1f, 1000.0f);
         
-        _shader.SetMatrix4("model", ref model);
-        _shader.SetMatrix4("view", ref view);
-        _shader.SetMatrix4("projection", ref projection);
-        _shader.SetFloat("fogDensity", 0.008f);
-        _shader.SetFloat("fogNear", (_world.RenderDistance - 3) * Chunk.Dimensions.X);
-        _shader.SetFloat("fogFar", (_world.RenderDistance + 2) * Chunk.Dimensions.X);
-        _shader.SetVector4("fogColor", Color.NormalizedRgba(135, 206, 245, 255));
+        _defaultShader.SetMatrix4("model", ref model);
+        _defaultShader.SetMatrix4("view", ref view);
+        _defaultShader.SetMatrix4("projection", ref projection);
+        _defaultShader.SetFloat("fogDensity", 0.008f);
+        _defaultShader.SetFloat("fogNear", (_camera.RenderDistance - 3) * Chunk.Dimensions.X);
+        _defaultShader.SetFloat("fogFar", (_camera.RenderDistance + 2) * Chunk.Dimensions.X);
+        _defaultShader.SetVector4("fogColor", Color.NormalizedRgba(135, 206, 245, 255));
+        _defaultShader.SetInt("enableFog", _enableFog ? 1 : 0);
+        _defaultShader.SetInt("enableLight", _enableLight ? 1 : 0);
 
+        _activeShader = _defaultShader;
+        
         GL.Enable(EnableCap.DepthTest);
-        
         GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
-        
         GL.Enable(EnableCap.Blend);
+    }
 
-        CursorState = CursorState.Grabbed;
+    private void UseWireframeShader()
+    {
+        _wireframeShader ??= new Shader("Shaders/shader.vert", "Shaders/wireframe.frag");
+        _wireframeShader.Use();
+        
+        Matrix4 model = Matrix4.CreateRotationX(0f);
+        Matrix4 view = _camera.GetViewMatrix();
+        Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45.0f), (float)_width / _height, 0.1f, 1000.0f);
+        
+        _wireframeShader.SetMatrix4("model", ref model);
+        _wireframeShader.SetMatrix4("view", ref view);
+        _wireframeShader.SetMatrix4("projection", ref projection);
+        _wireframeShader.SetFloat("lineThickness", 0.0001f);
+
+        _activeShader = _wireframeShader;
+        
+        GL.Disable(EnableCap.DepthTest);
+        GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+        GL.Enable(EnableCap.Blend);
+    }
+
+    private void ToggleFog()
+    {
+        if (_enableFog)
+        {
+            _enableFog = false;
+            _activeShader.SetInt("enableFog", 0);
+        }
+        else
+        {
+            _enableFog = true;
+            _activeShader.SetInt("enableFog", 1);
+        }
+    }
+
+    private void ToggleLight()
+    {
+        if (_enableLight)
+        {
+            _enableLight = false;
+            _activeShader.SetInt("enableLight", 0);
+        }
+        else
+        {
+            _enableFog = true;
+            _activeShader.SetInt("enableLight", 1);
+        }
+    }
+
+    private void ToggleChunkLoader()
+    {
+        _enableChunkLoader = !_enableChunkLoader;
+    }
+
+    private void SetRenderDistance(int dist)
+    {
+        _camera.RenderDistance = dist;
+        _world.Reset();
+        _defaultShader.SetFloat("fogNear", (_camera.RenderDistance - 3) * Chunk.Dimensions.X);
+        _defaultShader.SetFloat("fogFar", (_camera.RenderDistance + 2) * Chunk.Dimensions.X);
     }
 
     protected override void OnUnload()
@@ -313,7 +441,8 @@ public class Game : GameWindow
         GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
         GL.BindVertexArray(0);
         GL.UseProgram(0);
-        _shader.Dispose();
+        _defaultShader.Dispose();
+        _wireframeShader.Dispose();
         _texture.Dispose();
         base.OnUnload();
     }

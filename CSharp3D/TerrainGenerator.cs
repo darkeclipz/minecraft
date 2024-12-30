@@ -151,8 +151,6 @@ public static class TerrainGenerator
             }
             
             // Light
-            // Queue<BlockRef> lightFrontier = new Queue<BlockRef>();
-            
             for (int x = 0; x < Chunk.Dimensions.X; x++)
             for (int z = 0; z < Chunk.Dimensions.Z; z++)
             for (int y = Chunk.Dimensions.Y - 1; y >= 0; y--)
@@ -162,25 +160,12 @@ public static class TerrainGenerator
                 if (block.Type == BlockType.Air)
                 {
                     chunk.Blocks[x, y, z].LightLevel = 15;
-                    // lightFrontier.Enqueue(blockRef);
                 }
                 else
                 {
                     break;
                 }
             }
-
-            // while (lightFrontier.TryDequeue(out var blockRef))
-            // {
-            //     foreach (var neighbour in blockRef.GetNeighboursOnSameY().Where(n => n.IsAir))
-            //     {
-            //         if (neighbour.Block.LightLevel < blockRef.Block.LightLevel - 1)
-            //         {
-            //             neighbour.SetLightLevel(blockRef.Block.LightLevel - 1);
-            //             lightFrontier.Enqueue(neighbour);
-            //         }
-            //     }
-            // }
 
 
             // // Invert solids to see the caverns.

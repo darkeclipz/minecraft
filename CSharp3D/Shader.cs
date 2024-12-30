@@ -106,6 +106,12 @@ public class Shader : IDisposable
         GL.Uniform4f(loc, vector.X, vector.Y, vector.Z, vector.W);
     }
 
+    public void SetInt(string name, int value)
+    {
+        var loc = GetUniformLocation(name);
+        GL.Uniform1i(loc, value);
+    }
+
     protected virtual void Dispose(bool disposing)
     {
         if (!disposing) return;

@@ -3,19 +3,17 @@ using System.Net;
 
 namespace CSharp3D;
 
-public class ChunkGenerator
+public class MeshGenerator
 {
     private readonly Camera _camera;
     private readonly World _world;
     private readonly CancellationToken _cancellationToken;
     private readonly ConcurrentQueue<Chunk> _chunkGenerationRequests = [];
-    private readonly MeshGenerator _meshGenerator;
 
-    public ChunkGenerator(Camera camera, World world, MeshGenerator meshGenerator, CancellationToken cancellationToken)
+    public MeshGenerator(Camera camera, World world, CancellationToken cancellationToken)
     {
         _camera = camera;
         _world = world;
-        _meshGenerator = meshGenerator;
         _cancellationToken = cancellationToken;
         
         Task.Run(async () => ProcessQueue(), cancellationToken);
@@ -34,8 +32,7 @@ public class ChunkGenerator
                     {
                         try
                         {
-                            TerrainGenerator.GenerateChunk(chunk, _world);
-                            _meshGenerator.DispatchChunk(chunk);
+                            chunk.UpdateMesh(_world);
                         }
                         catch (Exception ex)
                         {
