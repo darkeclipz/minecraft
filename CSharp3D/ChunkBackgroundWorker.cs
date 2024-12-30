@@ -27,23 +27,42 @@ public class ChunkBackgroundWorker
         
         while (_cancellationToken.IsCancellationRequested == false)
         {
-            for (var i = 0; i < ItemsPerPass; i++)
-                if (_chunkGenerationRequests.TryDequeue(out var chunk))
-                {
-                    Task.Run(() =>
+            try
+            {
+                for (var i = 0; i < ItemsPerPass; i++)
+                    if (_chunkGenerationRequests.TryDequeue(out var requestedChunk))
                     {
-                        try
+                        Task.Run(() =>
                         {
-                            TerrainGenerator.GenerateChunk(chunk, _world);
-                            _meshBackgroundWorker.DispatchChunk(chunk);
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine($"ERROR: {ex}");                            
-                        }
+                            try
+                            {
+                                TerrainGenerator.GenerateChunk(requestedChunk, _world);
+                                requestedChunk.HasGenerated = true;
+                                _meshBackgroundWorker.DispatchChunk(requestedChunk);
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"ERROR: {ex}");                   
+                            }
 
-                    }, _cancellationToken);
-                }
+                        }, _cancellationToken);
+                    }
+                    // else
+                    // {
+                    //     foreach (var chunk in _world.Chunks.Values.Where(c => c.Mesh is not null))
+                    //     {
+                    //         if (chunk.NeighbourCount != chunk.Mesh.NeighbourCountAtGeneration)
+                    //         {
+                    //             _meshBackgroundWorker.DispatchChunk(chunk);
+                    //             break;
+                    //         }
+                    //     }
+                    // }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"ERROR: {ex}");  
+            }
             
             await Task.Delay(25);
         }

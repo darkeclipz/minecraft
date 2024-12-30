@@ -28,7 +28,12 @@ public class MeshBackgroundWorker
             for (var i = 0; i < ItemsPerPass; i++)
                 if (_chunkGenerationRequests.TryDequeue(out var chunk))
                 {
-                    if (!chunk.HasNeighbours)
+                    if (chunk.IsDisposed)
+                    {
+                        continue;
+                    }
+                    
+                    if (!chunk.CanRenderMesh)
                     {
                         _chunkGenerationRequests.Enqueue(chunk);
                         continue;

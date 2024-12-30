@@ -56,7 +56,8 @@ public class World
     {
         if (CurrentChunk == newChunk && !forceUpdate) return;
 
-        var chunkPositionsAroundPlayer = GetPointsAroundChunkWithinRenderDistance(newChunk.Position, _camera.RenderDistance).ToList();
+        var chunkPositionsAroundPlayer =
+            GetPointsAroundChunkWithinRenderDistance(newChunk.Position, _camera.RenderDistance).ToList();
 
         foreach (var chunkPosition in chunkPositionsAroundPlayer)
         {
@@ -64,15 +65,15 @@ public class World
             {
                 continue;
             }
-            
+
             if (Chunks.ContainsKey(chunkPosition.Xz))
             {
                 continue;
             }
-            
+
             LoadChunk(cameraPosition, chunkPosition);
         }
-        
+
         CurrentChunk = newChunk;
 
         foreach (var chunk in Chunks.Values.ToList())
@@ -82,8 +83,9 @@ public class World
                 UnloadChunk(chunk);
             }
         }
-        
+
         DispatchGenerationRequests();
+
     }
 
     public Chunk GetNearestChunk(Vector2 position)
@@ -127,8 +129,20 @@ public class World
 
         Chunks.Clear();
         _chunkBackgroundWorker.Clear();
+        _meshBackgroundWorker.Clear();
 
         Initialize();
+    }
+
+    public void Reload()
+    {
+        _chunkBackgroundWorker.Clear();
+        _meshBackgroundWorker.Clear();
+        
+        foreach (var chunk in Chunks.Values)
+        {
+            _chunkBackgroundWorker.DispatchChunk(chunk);
+        }
     }
 
     public BlockRef? GetBlockOrNull(Vector3 worldPos)
@@ -239,7 +253,7 @@ public class World
     {
         UnlinkNeighbours(chunk);
         Chunks.Remove(chunk.Position.Xz);
-        chunk.Dispose();
+        Game.ChunkDisposeQueue.Enqueue(chunk);
     }
 
     private IEnumerable<Vector3> GetPointsAroundChunkWithinRenderDistance(Chunk chunk, int renderDistance) 

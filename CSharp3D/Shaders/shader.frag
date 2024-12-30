@@ -29,6 +29,18 @@ void main()
 {
     vec4 color = texture(texture0, texCoord);
     
+    vec3 lightDir1 = normalize(vec3(0.80,1,1));
+    vec3 lightDir2 = normalize(vec3(-0.80,1,-1));
+    
+    float lambert1 = max(dot(normal, lightDir1), 0.0);
+    float lambert2 = max(dot(normal, lightDir2), 0.0);
+    
+    vec3 flatShadeFront = vec3(1) * clamp(lambert1, 0.0, 1.0);
+    vec3 flatShadeBack = vec3(1) * clamp(lambert2, 0.0, 1.0);
+    vec4 flatShade = vec4(flatShadeFront, 1.0) * 0.5 + vec4(flatShadeBack, 1.0) * 0.5;
+    
+    color = color * clamp(flatShade + 0.2, 0.0, 1.0);
+    
     if (enableLight == 1)
     {
         vec3 light = vec3(lightLevel * 0.7 + 0.3);

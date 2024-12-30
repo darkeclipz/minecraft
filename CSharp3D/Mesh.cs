@@ -14,10 +14,13 @@ public class Mesh : IDisposable
 
     private bool _isDirty = false;
 
+    public int NeighbourCountAtGeneration = 0;
+
     public static Mesh From(Chunk chunk, World world)
     {
         var stopwatch = Stopwatch.StartNew();
         List<float> vertices = [];
+        int neighbourCount = chunk.NeighbourCount;
         
         for (var y = Chunk.Dimensions.Y - 1; y >= 0; y--)
         {
@@ -123,6 +126,7 @@ public class Mesh : IDisposable
         return new Mesh
         {
             Vertices = vertices.ToArray(),
+            NeighbourCountAtGeneration = neighbourCount,
         };
     }
 
@@ -241,6 +245,8 @@ public class Mesh : IDisposable
         if (disposed) return;
         disposed = true;
         IsLoaded = false;
+        
+        Console.WriteLine($"Disposed mesh {VertexArrayObject}.");
         
         GL.DeleteVertexArray(VertexArrayObject);
         GL.DeleteBuffer(VertexBufferObject);

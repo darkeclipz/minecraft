@@ -7,6 +7,8 @@ public static class TerrainGenerator
 {
     public static void GenerateChunk(Chunk chunk, World world)
     {
+        int seaLevel = 100;
+        
         // Overworld
         {
             for (int x = 0; x < Chunk.Dimensions.X; x++)
@@ -24,11 +26,11 @@ public static class TerrainGenerator
                 var flatness = Math.Clamp(Noise.GradientNoise(0.001f * worldX, 0.001f * worldZ, Game.WorldSeed), -0.3, 1.0);
                 var height = mountains + hills * flatness;
         
-                if (y < 57 + height)
+                if (y < seaLevel - 3 + height)
                     chunk.Blocks[x, y, z].Type = BlockType.Sand;
-                else if (y < 60 + height)
+                else if (y < seaLevel + height)
                     chunk.Blocks[x, y, z].Type = BlockType.Dirt;
-                else if (y < 61 + height)
+                else if (y < seaLevel + 1 + height)
                     chunk.Blocks[x, y, z].Type = BlockType.Grass;
                 else
                     chunk.Blocks[x, y, z] = chunk.Blocks[x, y, z];
@@ -43,19 +45,19 @@ public static class TerrainGenerator
             {
                 var worldX = x + chunk.Position.X;
                 var worldZ = z + chunk.Position.Z;
-
+            
                 var amplitude = 0.05f;
-
+            
                 var cavyness = Math.Clamp(Noise.GradientNoise(0.001f * worldX, 0.001f * worldZ, Game.WorldSeed), -0.3, 1.0);
                 var limit = 60;
                 var depthFactor = 0.5 * Math.Clamp((limit - y) / limit, 0.0, 1.0);
-
+            
                 var amplitudeOffsetX = 0.2f * (float)(Noise.GradientNoise(0.001f * worldX, 0.001f * worldZ, Game.WorldSeed) * amplitude * 0.5);
                 var amplitudeOffsetY = 0.2f * (float)(Noise.GradientNoise(0.001f * worldX + 9347f, 0.001f * worldZ + 8126f, Game.WorldSeed) * amplitude * 0.5);
-
+            
                 var density = Noise.GradientNoise3D((amplitude + amplitudeOffsetX) * worldX, 0.1f * y, (amplitude + amplitudeOffsetY) * worldZ,
                     Game.WorldSeed);
-
+            
                 if (Math.Abs(density - 0.5) < 0.2)
                 {
                     chunk.Blocks[x, y, z].Type = BlockType.Air;
@@ -63,25 +65,26 @@ public static class TerrainGenerator
             }
             
             // Underground caverns
-            {
-                for (int x = 0; x < Chunk.Dimensions.X; x++)
-                for (int z = 0; z < Chunk.Dimensions.Z; z++)
-                for (int y = Chunk.Dimensions.Y - 1; y >= 0; y--)
-                {
-                    var worldX = x + chunk.Position.X;
-                    var worldZ = z + chunk.Position.Z;
-
-                    var amplitude = 0.03f;
-
-                    var density = Noise.GradientNoise3D(amplitude * worldX, 0.1f * y, amplitude * worldZ,
-                        Game.WorldSeed);
-
-                    if (y < 50 && Math.Abs(density - 0.5) < 0.2f)
-                    {
-                        chunk.Blocks[x, y, z].Type = BlockType.Air;
-                    }
-                }
-            }
+            // {
+            //     for (int x = 0; x < Chunk.Dimensions.X; x++)
+            //     for (int z = 0; z < Chunk.Dimensions.Z; z++)
+            //     for (int y = Chunk.Dimensions.Y - 1; y >= 0; y--)
+            //     {
+            //         var worldX = x + chunk.Position.X;
+            //         var worldZ = z + chunk.Position.Z;
+            //
+            //         var amplitude = 0.008f;
+            //
+            //         var height = (float)(Noise.GradientNoise(amplitude * worldX, amplitude * worldZ, Game.WorldSeed) * 0.5 + 0.5);
+            //         var density = Noise.GradientNoise3D(amplitude * worldX, amplitude * y, amplitude * worldZ,
+            //             Game.WorldSeed);
+            //
+            //         if (y < seaLevel - 30 && Math.Abs(density) < 0.2f)
+            //         {
+            //             chunk.Blocks[x, y, z].Type = BlockType.Air;
+            //         }
+            //     }
+            // }
             
             // Grass pass
             for (int x = 0; x < Chunk.Dimensions.X; x++)

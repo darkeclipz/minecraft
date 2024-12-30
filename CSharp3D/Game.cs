@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using CSharp3D;
 using Microsoft.Extensions.Configuration;
@@ -46,6 +47,10 @@ public class Game : GameWindow
     private bool _enableChunkLoader = true;
 
     private bool _enableLight = true;
+
+    public static ConcurrentQueue<Mesh> MeshDisposeQueue = [];
+    
+    public static ConcurrentQueue<Chunk> ChunkDisposeQueue = [];
     
     public Game(int width, int height, IConfiguration configuration)
         : base(GameWindowSettings.Default, new NativeWindowSettings 
@@ -137,7 +142,7 @@ public class Game : GameWindow
 
         if (input.IsKeyReleased(Keys.R))
         {
-            _world.Reset();
+            _world.Reload();
         }
 
         if (input.IsKeyReleased(Keys.C))
@@ -303,6 +308,16 @@ public class Game : GameWindow
             Console.WriteLine($"Current chunk updated to chunk {_world.CurrentChunk.Position.X}, {_world.CurrentChunk.Position.Z} in {sw.ElapsedMilliseconds} milliseconds.");
         }
         
+        if (ChunkDisposeQueue.TryDequeue(out var chunkToRemove))
+        {
+            chunkToRemove.Dispose();
+        }
+
+        if (MeshDisposeQueue.TryDequeue(out var meshToRemove))
+        {
+            meshToRemove.Dispose();
+        }
+        
         LimitFps(dt);
     }
 
@@ -417,7 +432,7 @@ public class Game : GameWindow
         }
         else
         {
-            _enableFog = true;
+            _enableLight = true;
             _activeShader.SetInt("enableLight", 1);
         }
     }

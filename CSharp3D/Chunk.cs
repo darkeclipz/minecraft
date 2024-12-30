@@ -23,6 +23,8 @@ public class Chunk : IDisposable
 
     public Mesh? Mesh { get; private set; }
 
+    public bool HasGenerated { get; set; } = false;
+
     public bool IsLoaded { get; private set; } = false;
     
     public AABB BoundingBox { get; }
@@ -41,6 +43,32 @@ public class Chunk : IDisposable
     
     public bool HasNeighbours => !(Front is null || Back is null || Left is null || Right is null);
 
+    public bool CanRenderMesh
+    {
+        get
+        {
+            if (!HasGenerated) return false;
+            if (Front is null || !Front.HasGenerated) return false;
+            if (Back is null || !Back.HasGenerated) return false;
+            if (Left is null || !Left.HasGenerated) return false;
+            if (Right is null || !Right.HasGenerated) return false;
+            return true;
+        }
+    }
+
+    public int NeighbourCount
+    {
+        get
+        {
+            var count = 0;
+            if (Front is not null) count++;
+            if (Back is not null) count++;
+            if (Left is not null) count++;
+            if (Right is not null) count++;
+            return count;
+        }
+    }
+
     public Chunk(Vector3 position, World world)
     {
         Position = position;
@@ -57,7 +85,14 @@ public class Chunk : IDisposable
 
     public void UpdateMesh(World world)
     {
+        var oldMesh = Mesh;
         Mesh = Mesh.From(this, world);
+
+        if (oldMesh is not null)
+        {
+            Game.MeshDisposeQueue.Enqueue(oldMesh);
+        }
+        
         IsLoaded = true;
     }
     
@@ -121,12 +156,15 @@ public class Chunk : IDisposable
 
     public Vector3 Midpoint => new Vector3(Position.X + Dimensions.X / 2, Position.Y + Dimensions.Y / 2, Position.Z - Dimensions.Z / 2);
 
-    private bool disposed = false;
+    public bool IsDisposed { get; private set; }
     
     public void Dispose()
     {
-        if (disposed) return;
-        disposed = true;
+        if (IsDisposed) return;
+        
+        Console.WriteLine($"Disposed chunk {Position.X}, {Position.Z}.");
+        
+        IsDisposed = true;
         Mesh?.Dispose();
     }
 

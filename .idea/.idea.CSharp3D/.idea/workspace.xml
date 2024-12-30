@@ -9,19 +9,20 @@
   <component name="ChangeListManager">
     <list default="true" id="cfd5feee-a153-4a1f-b87b-fde73bb04f56" name="Changes" comment=".">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.CSharp3D/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.CSharp3D/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CSharp3D.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D.sln.DotSettings.user" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CSharp3D/Chunk.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/Chunk.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CSharp3D/ChunkGenerator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/ChunkBackgroundWorker.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CSharp3D/ChunkBackgroundWorker.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/ChunkBackgroundWorker.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CSharp3D/Game.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/Game.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CSharp3D/Mesh.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/Mesh.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CSharp3D/MeshGenerator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/MeshBackgroundWorker.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CSharp3D/MeshBackgroundWorker.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/MeshBackgroundWorker.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CSharp3D/Shaders/shader.frag" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/Shaders/shader.frag" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CSharp3D/TerrainGenerator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/TerrainGenerator.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CSharp3D/World.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/World.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CSharp3D/bin/Debug/net9.0/CSharp3D.dll" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/bin/Debug/net9.0/CSharp3D.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CSharp3D/bin/Debug/net9.0/CSharp3D.exe" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/bin/Debug/net9.0/CSharp3D.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CSharp3D/bin/Debug/net9.0/CSharp3D.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/bin/Debug/net9.0/CSharp3D.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CSharp3D/bin/Debug/net9.0/Shaders/shader.frag" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/bin/Debug/net9.0/Shaders/shader.frag" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CSharp3D/obj/Debug/net9.0/CSharp3D.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/obj/Debug/net9.0/CSharp3D.AssemblyInfo.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CSharp3D/obj/Debug/net9.0/CSharp3D.AssemblyInfoInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/obj/Debug/net9.0/CSharp3D.AssemblyInfoInputs.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CSharp3D/obj/Debug/net9.0/CSharp3D.csproj.CoreCompileInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/obj/Debug/net9.0/CSharp3D.csproj.CoreCompileInputs.cache" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CSharp3D/obj/Debug/net9.0/CSharp3D.dll" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/obj/Debug/net9.0/CSharp3D.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CSharp3D/obj/Debug/net9.0/CSharp3D.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/obj/Debug/net9.0/CSharp3D.pdb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CSharp3D/obj/Debug/net9.0/apphost.exe" beforeDir="false" afterPath="$PROJECT_DIR$/CSharp3D/obj/Debug/net9.0/apphost.exe" afterDir="false" />
@@ -79,7 +80,7 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "settings.editor.selected.configurable": "preferences.lookFeel",
     "vue.rearranger.settings.migration": "true"
   },
   "keyToStringList": {
@@ -120,7 +121,7 @@
       <workItem from="1734628235943" duration="14296000" />
       <workItem from="1735391725554" duration="78201000" />
       <workItem from="1735557161556" duration="698000" />
-      <workItem from="1735557868786" duration="11858000" />
+      <workItem from="1735557868786" duration="21162000" />
     </task>
     <task id="LOCAL-00001" summary="Add git ignore.">
       <option name="closed" value="true" />
@@ -234,7 +235,15 @@
       <option name="project" value="LOCAL" />
       <updated>1735568187188</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary=".">
+      <option name="closed" value="true" />
+      <created>1735570111353</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1735570111353</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
