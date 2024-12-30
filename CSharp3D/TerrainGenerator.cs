@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using OpenTK.Graphics.Vulkan;
 
@@ -7,7 +8,10 @@ public static class TerrainGenerator
 {
     public static void GenerateChunk(Chunk chunk, World world)
     {
-        int seaLevel = 100;
+        var stopwatch = Stopwatch.StartNew();
+        const int seaLevel = 100;
+
+        chunk.Blocks = new Block[Chunk.Dimensions.X, Chunk.Dimensions.Y, Chunk.Dimensions.Z];
         
         // Overworld
         {
@@ -27,7 +31,7 @@ public static class TerrainGenerator
                 var height = mountains + hills * flatness;
         
                 if (y < seaLevel - 3 + height)
-                    chunk.Blocks[x, y, z].Type = BlockType.Sand;
+                    chunk.Blocks[x, y, z].Type = BlockType.Stone;
                 else if (y < seaLevel + height)
                     chunk.Blocks[x, y, z].Type = BlockType.Dirt;
                 else if (y < seaLevel + 1 + height)
@@ -152,6 +156,190 @@ public static class TerrainGenerator
                     
                 }
             }
+
+            // Coal ore
+            {
+                var rng = new Random(chunk.Position.GetHashCode());
+                
+                for (int x = 0; x < Chunk.Dimensions.X; x++)
+                for (int z = 0; z < Chunk.Dimensions.Z; z++)
+                for (int y = Chunk.Dimensions.Y - 2; y >= 0; y--)
+                {
+                    if (chunk.Blocks[x, y, z].Type == BlockType.Stone)
+                    {
+                        var p = rng.NextDouble();
+                        var c = Math.Clamp((y - 20.0) / 100.0, 0.0, 1.0);
+
+                        if (p < 0.0025 * c)
+                        {
+                            chunk.Blocks[x, y, z].Type = BlockType.CoalOre;
+                            var blockRef = chunk.GetBlockRef(x, y, z);
+
+                            var frontier = new Queue<BlockRef>();
+                            frontier.Enqueue(blockRef);
+
+                            while (frontier.TryDequeue(out var currentBlockRef))
+                            {
+                                currentBlockRef.SetBlockType(BlockType.CoalOre);
+                                var neighbours = blockRef.GetNeighbours9X9();
+
+                                foreach (var neighbour in neighbours)
+                                {
+                                    if (neighbour.Block.Type == BlockType.Stone && rng.NextDouble() < 0.08)
+                                    {
+                                        frontier.Enqueue(neighbour);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Iron ore
+            {
+                var rng = new Random(chunk.Position.GetHashCode());
+                
+                for (int x = 0; x < Chunk.Dimensions.X; x++)
+                for (int z = 0; z < Chunk.Dimensions.Z; z++)
+                for (int y = Chunk.Dimensions.Y - 2; y >= 0; y--)
+                {
+                    if (chunk.Blocks[x, y, z].Type == BlockType.Stone)
+                    {
+                        var p = rng.NextDouble();
+                        var c = Math.Clamp((140.0 - y) / 60.0, 0.0, 1.0);
+
+                        if (p < 0.002 * c)
+                        {
+                            chunk.Blocks[x, y, z].Type = BlockType.DiamondOre;
+                            var blockRef = chunk.GetBlockRef(x, y, z);
+
+                            var frontier = new Queue<BlockRef>();
+                            frontier.Enqueue(blockRef);
+
+                            while (frontier.TryDequeue(out var currentBlockRef))
+                            {
+                                currentBlockRef.SetBlockType(BlockType.IronOre);
+                                var neighbours = blockRef.GetNeighbours9X9();
+
+                                foreach (var neighbour in neighbours)
+                                {
+                                    if (neighbour.Block.Type == BlockType.Stone && rng.NextDouble() < 0.08)
+                                    {
+                                        frontier.Enqueue(neighbour);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Diamond
+            {
+                var rng = new Random(chunk.Position.GetHashCode());
+                
+                for (int x = 0; x < Chunk.Dimensions.X; x++)
+                for (int z = 0; z < Chunk.Dimensions.Z; z++)
+                for (int y = Chunk.Dimensions.Y - 2; y >= 0; y--)
+                {
+                    if (chunk.Blocks[x, y, z].Type == BlockType.Stone)
+                    {
+                        var p = rng.NextDouble();
+                        var c = Math.Clamp((75.0 - y) / 75.0, 0.0, 1.0);
+
+                        if (p < 0.00055 * c)
+                        {
+                            chunk.Blocks[x, y, z].Type = BlockType.DiamondOre;
+                            var blockRef = chunk.GetBlockRef(x, y, z);
+
+                            var frontier = new Queue<BlockRef>();
+                            frontier.Enqueue(blockRef);
+
+                            while (frontier.TryDequeue(out var currentBlockRef))
+                            {
+                                currentBlockRef.SetBlockType(BlockType.DiamondOre);
+                                var neighbours = blockRef.GetNeighbours9X9();
+
+                                foreach (var neighbour in neighbours)
+                                {
+                                    if (neighbour.Block.Type == BlockType.Stone && rng.NextDouble() < 0.035)
+                                    {
+                                        frontier.Enqueue(neighbour);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            
+            // Dirt
+            {
+                var rng = new Random(chunk.Position.GetHashCode());
+                
+                for (int x = 0; x < Chunk.Dimensions.X; x++)
+                for (int z = 0; z < Chunk.Dimensions.Z; z++)
+                for (int y = Chunk.Dimensions.Y - 2; y >= 0; y--)
+                {
+                    if (chunk.Blocks[x, y, z].Type == BlockType.Stone)
+                    {
+                        var p = rng.NextDouble();
+
+                        if (p < 0.00125)
+                        {
+                            chunk.Blocks[x, y, z].Type = BlockType.Dirt;
+                            var blockRef = chunk.GetBlockRef(x, y, z);
+
+                            var frontier = new Queue<BlockRef>();
+                            frontier.Enqueue(blockRef);
+
+                            while (frontier.TryDequeue(out var currentBlockRef))
+                            {
+                                currentBlockRef.SetBlockType(BlockType.Dirt);
+                                var neighbours = currentBlockRef.GetNeighbours9X9();
+
+                                foreach (var neighbour in neighbours)
+                                {
+                                    if (neighbour.Block.Type == BlockType.Stone && rng.NextDouble() < 0.06)
+                                    {
+                                        frontier.Enqueue(neighbour);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Bedrock
+            {
+                for (int x = 0; x < Chunk.Dimensions.X; x++)
+                for (int z = 0; z < Chunk.Dimensions.Z; z++)
+                {
+                    chunk.Blocks[x, 0, z].Type = BlockType.Bedrock;
+                }    
+            }
+            
+            // Plants
+            {
+                var rng = new Random(chunk.Position.GetHashCode());
+                
+                for (int x = 0; x < Chunk.Dimensions.X; x++)
+                for (int z = 0; z < Chunk.Dimensions.Z; z++)
+                {
+                    // Place random grass.
+                    var ry = chunk.HeightAt(x, z);
+                
+                    var isGrass = chunk.Blocks[x, ry, z].Type == BlockType.Grass;
+ 
+                    if (ry < Chunk.Dimensions.Y && isGrass && rng.NextDouble()< 0.01)
+                    {
+                        chunk.Blocks[x, ry + 1, z].Type = GetRandomFlower(rng);
+                    }
+                }
+            }
             
             // Light
             for (int x = 0; x < Chunk.Dimensions.X; x++)
@@ -160,9 +348,12 @@ public static class TerrainGenerator
             {
                 var block = chunk.Blocks[x, y, z];
 
-                if (block.Type == BlockType.Air)
+                if (!Block.IsSolid(block.Type))
                 {
-                    chunk.Blocks[x, y, z].LightLevel = 15;
+                    if (!Block.IsPlant(chunk.Blocks[x, y, z].Type))
+                    {
+                        chunk.Blocks[x, y, z].LightLevel = 15; 
+                    }
                 }
                 else
                 {
@@ -185,6 +376,9 @@ public static class TerrainGenerator
             //         chunk.Blocks[x, y, z] = BlockType.Air;
             //     }
             // }
+            
+            stopwatch.Stop();
+            Console.WriteLine($"Generated terrain for chunk {chunk.Position.X},{chunk.Position.Z} in {stopwatch.ElapsedMilliseconds} milliseconds.");
         }
 
         double Lift(double x, double exp)
@@ -195,6 +389,16 @@ public static class TerrainGenerator
         double Exeggarate(double x)
         {
             return Math.Pow(x, 3.0);
+        }
+
+        BlockType GetRandomFlower(Random rng)
+        {
+            var p = rng.NextDouble();
+
+            if (p < 0.15) return BlockType.Flower3;
+            if (p < 0.30) return BlockType.Flower4;
+            if (p < 0.40) return BlockType.Flower1;
+            return BlockType.Flower2;
         }
 
     }

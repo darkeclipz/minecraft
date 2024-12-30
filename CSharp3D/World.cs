@@ -20,6 +20,8 @@ public class World
 
     private MeshBackgroundWorker _meshBackgroundWorker;
 
+    private Task _chunkUnloader;
+
     public const int UpdateDistanceThreshold = 20;
 
     public World(Camera camera)
@@ -27,6 +29,7 @@ public class World
         _camera = camera;
         _meshBackgroundWorker = new MeshBackgroundWorker(camera, this, Game.CancellationToken);
         _chunkBackgroundWorker = new ChunkBackgroundWorker(camera, this, _meshBackgroundWorker, Game.CancellationToken);
+        _chunkUnloader = Task.Run(ChunkUnloader);
         Initialize();
     }
 
@@ -48,8 +51,8 @@ public class World
 
     public bool IsChunkInRenderDistance(Vector3 cameraPosition, Vector3 chunkMidpoint)
     {
-        var distance = Vector2.Distance(cameraPosition.Xz, chunkMidpoint.Xz) / Chunk.Dimensions.X;
-        return distance < _camera.RenderDistance + 1;
+        var maxDistance = (_camera.RenderDistance + 1) * Chunk.Dimensions.X;
+        return Vector2.DistanceSquared(cameraPosition.Xz, chunkMidpoint.Xz) < maxDistance * maxDistance;
     }
 
     public void UpdateCurrentChunk(Vector3 cameraPosition, Chunk newChunk, bool forceUpdate = false)
@@ -61,12 +64,12 @@ public class World
 
         foreach (var chunkPosition in chunkPositionsAroundPlayer)
         {
-            if (!IsChunkInRenderDistance(cameraPosition, chunkPosition))
+            if (Chunks.ContainsKey(chunkPosition.Xz))
             {
                 continue;
             }
-
-            if (Chunks.ContainsKey(chunkPosition.Xz))
+            
+            if (!IsChunkInRenderDistance(cameraPosition, chunkPosition))
             {
                 continue;
             }
@@ -76,16 +79,35 @@ public class World
 
         CurrentChunk = newChunk;
 
-        foreach (var chunk in Chunks.Values.ToList())
-        {
-            if (!chunkPositionsAroundPlayer.Contains(chunk.Position))
-            {
-                UnloadChunk(chunk);
-            }
-        }
+
 
         DispatchGenerationRequests();
 
+    }
+
+    private void ChunkUnloader()
+    {
+        while (true)
+        {
+            try
+            {
+                var maxDistance = (_camera.RenderDistance + 3) * Chunk.Dimensions.X;
+
+                foreach (var chunk in Chunks.Values.ToList())
+                {
+                    if (Vector2.DistanceSquared(_camera.Position.Xz, chunk.Midpoint.Xz) > maxDistance * maxDistance)
+                    {
+                        UnloadChunk(chunk);
+                    }
+                }
+
+                Thread.Sleep(100);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"ERROR: Chunk unloader encoutered {ex}");
+            }
+        }
     }
 
     public Chunk GetNearestChunk(Vector2 position)
@@ -117,7 +139,7 @@ public class World
             sortedChunks.Add((distance, chunk));
         }
         
-        return sortedChunks.OrderBy(sc => sc.Item1).Select(sc => sc.Item2);
+        return sortedChunks.OrderByDescending(sc => sc.Item1).Select(sc => sc.Item2);
     }
 
     public void Reset()

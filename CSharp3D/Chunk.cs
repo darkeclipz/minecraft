@@ -4,15 +4,6 @@ using OpenTK.Mathematics;
 
 namespace CSharp3D;
 
-public struct Block
-{
-    public BlockType Type;
-    public int LightLevel;
-    
-    public static Block LitAir = new Block { Type = BlockType.Air, LightLevel = 15 };
-    public static Block UnlitAir = new Block { Type = BlockType.Air, LightLevel = 0 };
-}
-
 public class Chunk : IDisposable
 {
     public Vector3 Position { get; }
@@ -22,6 +13,8 @@ public class Chunk : IDisposable
     public Block[,,] Blocks { get; set; } = new Block[Dimensions.X, Dimensions.Y, Dimensions.Z];
 
     public Mesh? Mesh { get; private set; }
+    
+    public Mesh? TransparentMesh { get; private set; }
 
     public bool HasGenerated { get; set; } = false;
 
@@ -86,11 +79,19 @@ public class Chunk : IDisposable
     public void UpdateMesh(World world)
     {
         var oldMesh = Mesh;
-        Mesh = Mesh.From(this, world);
+        Mesh = Mesh.FromSolidBlocks(this, world);
 
         if (oldMesh is not null)
         {
             Game.MeshDisposeQueue.Enqueue(oldMesh);
+        }
+        
+        var oldTransparentMesh = TransparentMesh;
+        TransparentMesh = Mesh.FromTransparentBlocks(this, world);
+
+        if (oldTransparentMesh is not null)
+        {
+            Game.MeshDisposeQueue.Enqueue(oldTransparentMesh);
         }
         
         IsLoaded = true;
@@ -102,7 +103,7 @@ public class Chunk : IDisposable
 
         if (block.HasValue)
         {
-            return block.Value.Type != BlockType.Air;
+            return Block.IsSolid(block.Value.Type);
         }
 
         return false;
@@ -166,6 +167,7 @@ public class Chunk : IDisposable
         
         IsDisposed = true;
         Mesh?.Dispose();
+        TransparentMesh?.Dispose();
     }
 
     public float GetOpacity()

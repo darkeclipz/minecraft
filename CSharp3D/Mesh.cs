@@ -16,7 +16,58 @@ public class Mesh : IDisposable
 
     public int NeighbourCountAtGeneration = 0;
 
-    public static Mesh From(Chunk chunk, World world)
+    public static Mesh FromTransparentBlocks(Chunk chunk, World world)
+    {
+        List<float> vertices = [];
+        int neighbourCount = chunk.NeighbourCount;
+
+        for (var y = Chunk.Dimensions.Y - 1; y >= 0; y--)
+        {
+            for (var x = 0; x < Chunk.Dimensions.X; x++)
+            {
+                for (var z = 0; z < Chunk.Dimensions.Z; z++)
+                {
+                    if (Block.IsPlant(chunk.Blocks[x, y, z].Type))
+                    {
+                        var wx = chunk.Position.X + x;
+                        var wy = chunk.Position.Y + y;
+                        var wz = chunk.Position.Z + z;
+                        
+                        var bt = (int)chunk.Blocks[x, y, z].Type;
+                        var top = chunk.GetBlock(x, y + 1, z) ?? Block.LitAir;
+                        
+                        // Side 1
+                        {
+                            vertices.AddRange([-0.5f + wx,  0.5f + wy,  0.5f + wz, 1f, 0f, 1f, 1f, 0f, 0f, Tx(0.0f, bt), Ty(1.0f, bt), Li(top)]);
+                            vertices.AddRange([ 0.5f + wx,  0.5f + wy, -0.5f + wz, 1f, 0f, 1f, 0f, 1f, 0f, Tx(1.0f, bt), Ty(1.0f, bt), Li(top)]);
+                            vertices.AddRange([ 0.5f + wx, -0.5f + wy, -0.5f + wz, 1f, 0f, 1f, 0f, 0f, 1f, Tx(1.0f, bt), Ty(0.0f, bt), Li(top)]);
+                            vertices.AddRange([ 0.5f + wx, -0.5f + wy, -0.5f + wz, 1f, 0f, 1f, 1f, 0f, 0f, Tx(1.0f, bt), Ty(0.0f, bt), Li(top)]);
+                            vertices.AddRange([-0.5f + wx, -0.5f + wy,  0.5f + wz, 1f, 0f, 1f, 0f, 1f, 0f, Tx(0.0f, bt), Ty(0.0f, bt), Li(top)]);
+                            vertices.AddRange([-0.5f + wx,  0.5f + wy,  0.5f + wz, 1f, 0f, 1f, 0f, 0f, 1f, Tx(0.0f, bt), Ty(1.0f, bt), Li(top)]);
+                        }
+
+                        // Side 2
+                        {
+                            vertices.AddRange([-0.5f + wx,  0.5f + wy, -0.5f + wz, -1f, 0f, -1f, 1f, 0f, 0f, Tx(0.0f, bt), Ty(1.0f, bt), Li(top)]);
+                            vertices.AddRange([ 0.5f + wx,  0.5f + wy,  0.5f + wz, -1f, 0f, -1f, 0f, 1f, 0f, Tx(1.0f, bt), Ty(1.0f, bt), Li(top)]);
+                            vertices.AddRange([ 0.5f + wx, -0.5f + wy,  0.5f + wz, -1f, 0f, -1f, 0f, 0f, 1f, Tx(1.0f, bt), Ty(0.0f, bt), Li(top)]);
+                            vertices.AddRange([ 0.5f + wx, -0.5f + wy,  0.5f + wz, -1f, 0f, -1f, 1f, 0f, 0f, Tx(1.0f, bt), Ty(0.0f, bt), Li(top)]);
+                            vertices.AddRange([-0.5f + wx, -0.5f + wy, -0.5f + wz, -1f, 0f, -1f, 0f, 1f, 0f, Tx(0.0f, bt), Ty(0.0f, bt), Li(top)]);
+                            vertices.AddRange([-0.5f + wx,  0.5f + wy, -0.5f + wz, -1f, 0f, -1f, 0f, 0f, 1f, Tx(0.0f, bt), Ty(1.0f, bt), Li(top)]);
+                        }   
+                    }
+                }
+            }
+        }
+
+        return new Mesh
+        {
+            Vertices = vertices.ToArray(),
+            NeighbourCountAtGeneration = neighbourCount,
+        };
+    }
+
+    public static Mesh FromSolidBlocks(Chunk chunk, World world)
     {
         var stopwatch = Stopwatch.StartNew();
         List<float> vertices = [];
@@ -28,7 +79,7 @@ public class Mesh : IDisposable
             {
                 for (var z = 0; z < Chunk.Dimensions.Z; z++)
                 {
-                    if (chunk.Blocks[x, y, z].Type != BlockType.Air)
+                    if (Block.IsSolid(chunk.Blocks[x, y, z].Type))
                     {
                         var wx = chunk.Position.X + x;
                         var wy = chunk.Position.Y + y;
@@ -202,16 +253,6 @@ public class Mesh : IDisposable
                 Side.Top => BlockType.Grass,
                 Side.Bottom => BlockType.Dirt,
                 _ => BlockType.GrassSide
-            };
-        }
-
-        if (type == BlockType.SinisterGrass)
-        {
-            return side switch
-            {
-                Side.Top => BlockType.SinisterGrass,
-                Side.Bottom => BlockType.Dirt,
-                _ => BlockType.SinisterGrassSide
             };
         }
 

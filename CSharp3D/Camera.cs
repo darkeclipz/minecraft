@@ -12,6 +12,7 @@ public class Camera
     public float Sensitivity { get; } = 0.05f;
     public float Pitch { get; set; } = 0f;
     public float Yaw { get; set; } = 0f;
+    public float FieldOfView { get; set; } = 70f;
     public int RenderDistance { get; set; } = 11;
 
     public Matrix4 GetViewMatrix()

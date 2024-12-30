@@ -15,5 +15,12 @@ public enum BlockType : byte
     Leaves = 10,
     SinisterLeaves = 11,
     SinisterGrass = 12,
-    SinisterGrassSide = 13,
+    Bedrock = 13,
+    Flower1 = 14,
+    Flower2 = 15,
+    Flower3 = 16,
+    Flower4 = 17,
+    IronOre = 18,
+    CoalOre = 19,
+    DiamondOre = 20,
 }

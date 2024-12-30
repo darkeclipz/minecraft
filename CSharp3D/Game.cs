@@ -83,23 +83,18 @@ public class Game : GameWindow
 
     protected override void OnRenderFrame(FrameEventArgs e)
     {
+        Stopwatch sw = Stopwatch.StartNew();
+        
         base.OnRenderFrame(e);
         GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
         _activeShader.Use();
 
         int loadedChunks = 0;
-        const int loadMaxChunksPerPass = 3;
+        const int loadMaxChunksPerPass = 16;
         
         foreach (var chunk in _world.GetChunksSortedByDistance(_camera.Position))
         {
             if (!chunk.IsLoaded) continue;
-
-            if (!chunk.Mesh.IsLoaded && loadedChunks < loadMaxChunksPerPass)
-            {
-                chunk.Mesh.Use();
-                loadedChunks++;
-            }
-
             if (!chunk.Mesh.IsLoaded) continue;
             
             _activeShader.SetFloat("opacity", chunk.GetOpacity());
@@ -108,8 +103,25 @@ public class Game : GameWindow
             GL.DrawArrays(PrimitiveType.Triangles, 0, chunk.Mesh.Vertices.Length / Mesh.VertexBufferCount);
         }
         
+        foreach (var chunk in _world.GetChunksSortedByDistance(_camera.Position))
+        {
+            if (!chunk.IsLoaded) continue;
+            if (!chunk.Mesh.IsLoaded) continue;
+            
+            _activeShader.SetFloat("opacity", chunk.GetOpacity());
+            
+            GL.BindVertexArray(chunk.TransparentMesh.VertexArrayObject);
+            GL.DrawArrays(PrimitiveType.Triangles, 0, chunk.TransparentMesh.Vertices.Length / Mesh.VertexBufferCount);
+        }
+        
         SwapBuffers();
         _frameCount++;
+
+        if (loadedChunks > 0)
+        {
+            sw.Stop();
+            Console.WriteLine($"Rendered frame (with chunks generated) in {sw.ElapsedMilliseconds} ms.");
+        }
     }
 
     protected override void OnMouseMove(MouseMoveEventArgs e)
@@ -317,6 +329,21 @@ public class Game : GameWindow
         {
             meshToRemove.Dispose();
         }
+
+        int loadedChunks = 0;
+        const int loadMaxChunksPerPass = 16;
+        
+        foreach (var chunk in _world.GetChunksSortedByDistance(_camera.Position))
+        {
+            if (!chunk.IsLoaded) continue;
+
+            if (!chunk.Mesh.IsLoaded && loadedChunks < loadMaxChunksPerPass)
+            {
+                chunk.Mesh.Use();
+                chunk.TransparentMesh.Use();
+                loadedChunks++;
+            }
+        }
         
         LimitFps(dt);
     }
@@ -338,7 +365,7 @@ public class Game : GameWindow
         _width = e.Width;
         _height = e.Height;
         GL.Viewport(0, 0, e.Width, e.Height);
-        Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45.0f), (float)_width / _height, 0.1f, 1000.0f);
+        Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(_camera.FieldOfView), (float)_width / _height, 0.1f, 1000.0f);
         _defaultShader.SetMatrix4("projection", ref projection);
         Console.WriteLine($"Resized window to ({e.Width}, {e.Height}).");
     }
@@ -369,7 +396,7 @@ public class Game : GameWindow
         
         Matrix4 model = Matrix4.CreateRotationX(0f);
         Matrix4 view = _camera.GetViewMatrix();
-        Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45.0f), (float)_width / _height, 0.1f, 1000.0f);
+        Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(_camera.FieldOfView), (float)_width / _height, 0.1f, 1000.0f);
         
         _defaultShader.SetMatrix4("model", ref model);
         _defaultShader.SetMatrix4("view", ref view);
@@ -395,7 +422,7 @@ public class Game : GameWindow
         
         Matrix4 model = Matrix4.CreateRotationX(0f);
         Matrix4 view = _camera.GetViewMatrix();
-        Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45.0f), (float)_width / _height, 0.1f, 1000.0f);
+        Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(_camera.FieldOfView), (float)_width / _height, 0.1f, 1000.0f);
         
         _wireframeShader.SetMatrix4("model", ref model);
         _wireframeShader.SetMatrix4("view", ref view);
@@ -456,8 +483,8 @@ public class Game : GameWindow
         GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
         GL.BindVertexArray(0);
         GL.UseProgram(0);
-        _defaultShader.Dispose();
-        _wireframeShader.Dispose();
+        _defaultShader?.Dispose();
+        _wireframeShader?.Dispose();
         _texture.Dispose();
         base.OnUnload();
     }
