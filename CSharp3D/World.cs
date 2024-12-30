@@ -16,17 +16,17 @@ public class World
     
     private Camera _camera;
     
-    private ChunkGenerator _chunkGenerator;
+    private ChunkBackgroundWorker _chunkBackgroundWorker;
 
-    private MeshGenerator _meshGenerator;
+    private MeshBackgroundWorker _meshBackgroundWorker;
 
     public const int UpdateDistanceThreshold = 20;
 
     public World(Camera camera)
     {
         _camera = camera;
-        _meshGenerator = new MeshGenerator(camera, this, Game.CancellationToken);
-        _chunkGenerator = new ChunkGenerator(camera, this, _meshGenerator, Game.CancellationToken);
+        _meshBackgroundWorker = new MeshBackgroundWorker(camera, this, Game.CancellationToken);
+        _chunkBackgroundWorker = new ChunkBackgroundWorker(camera, this, _meshBackgroundWorker, Game.CancellationToken);
         Initialize();
     }
 
@@ -126,7 +126,7 @@ public class World
         }
 
         Chunks.Clear();
-        _chunkGenerator.Clear();
+        _chunkBackgroundWorker.Clear();
 
         Initialize();
     }
@@ -168,7 +168,7 @@ public class World
             chunk.Right = right;
             right.Left = chunk;
             
-            _meshGenerator.DispatchChunk(right);
+            // if (right.HasNeighbours) _meshGenerator.DispatchChunk(right);
         }
         
         if (Chunks.TryGetValue(chunk.Position.Xz - Vector2.UnitX * Chunk.Dimensions.X, out var left))
@@ -176,7 +176,7 @@ public class World
             chunk.Left = left;
             left.Right = chunk;
             
-            _meshGenerator.DispatchChunk(left);
+            // if (left.HasNeighbours) _meshGenerator.DispatchChunk(left);
         }
 
         if (Chunks.TryGetValue(chunk.Position.Xz + Vector2.UnitY * Chunk.Dimensions.Z, out var front))
@@ -184,7 +184,7 @@ public class World
             chunk.Front = front;
             front.Back = chunk;
             
-            _meshGenerator.DispatchChunk(front);
+            // if (front.HasNeighbours) _meshGenerator.DispatchChunk(front);
         }
         
         if (Chunks.TryGetValue(chunk.Position.Xz - Vector2.UnitY * Chunk.Dimensions.Z, out var back))
@@ -192,7 +192,7 @@ public class World
             chunk.Back = back;
             back.Front = chunk;
             
-            _meshGenerator.DispatchChunk(back);
+            // if (back.HasNeighbours) _meshGenerator.DispatchChunk(back);
         }
     }
 
@@ -229,7 +229,7 @@ public class World
                      .OrderBy(gr => gr.DistanceFromCamera)
                      .Select(gr => gr.Chunk))
         {
-            _chunkGenerator.DispatchChunk(requestedChunk);
+            _chunkBackgroundWorker.DispatchChunk(requestedChunk);
         }
 
         _chunkGenerationRequests.Clear();

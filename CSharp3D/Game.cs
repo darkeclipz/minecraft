@@ -100,7 +100,7 @@ public class Game : GameWindow
             _activeShader.SetFloat("opacity", chunk.GetOpacity());
             
             GL.BindVertexArray(chunk.Mesh.VertexArrayObject);
-            GL.DrawArrays(PrimitiveType.Triangles, 0, chunk.Mesh.Vertices.Length / Mesh.VertexBufferCount);    
+            GL.DrawArrays(PrimitiveType.Triangles, 0, chunk.Mesh.Vertices.Length / Mesh.VertexBufferCount);
         }
         
         SwapBuffers();

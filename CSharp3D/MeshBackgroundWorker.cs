@@ -3,19 +3,17 @@ using System.Net;
 
 namespace CSharp3D;
 
-public class ChunkGenerator
+public class MeshBackgroundWorker
 {
     private readonly Camera _camera;
     private readonly World _world;
     private readonly CancellationToken _cancellationToken;
     private readonly ConcurrentQueue<Chunk> _chunkGenerationRequests = [];
-    private readonly MeshGenerator _meshGenerator;
 
-    public ChunkGenerator(Camera camera, World world, MeshGenerator meshGenerator, CancellationToken cancellationToken)
+    public MeshBackgroundWorker(Camera camera, World world, CancellationToken cancellationToken)
     {
         _camera = camera;
         _world = world;
-        _meshGenerator = meshGenerator;
         _cancellationToken = cancellationToken;
         
         Task.Run(async () => ProcessQueue(), cancellationToken);
@@ -23,19 +21,24 @@ public class ChunkGenerator
 
     private async Task ProcessQueue()
     {
-        const int ItemsPerPass = 8;
+        const int ItemsPerPass = 16;
         
         while (_cancellationToken.IsCancellationRequested == false)
         {
             for (var i = 0; i < ItemsPerPass; i++)
                 if (_chunkGenerationRequests.TryDequeue(out var chunk))
                 {
+                    if (!chunk.HasNeighbours)
+                    {
+                        _chunkGenerationRequests.Enqueue(chunk);
+                        continue;
+                    }
+                    
                     Task.Run(() =>
                     {
                         try
                         {
-                            TerrainGenerator.GenerateChunk(chunk, _world);
-                            _meshGenerator.DispatchChunk(chunk);
+                            chunk.UpdateMesh(_world);
                         }
                         catch (Exception ex)
                         {

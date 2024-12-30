@@ -33,13 +33,13 @@ public class Mesh : IDisposable
 
                         var position = new Vector3(x, y, z);
                         var block = chunk.Blocks[x, y, z];
-                        
-                        var top = y + 1 < Chunk.Dimensions.Y ? chunk.Blocks[x, y + 1, z] : Block.LitAir;
-                        var bot = y - 1 > 0 ? chunk.Blocks[x, y - 1, z] : Block.UnlitAir;
-                        var fro = z - 1 > 0 ? chunk.Blocks[x, y, z - 1] : Block.LitAir;
-                        var bac = z + 1 < Chunk.Dimensions.Z ? chunk.Blocks[x, y, z + 1] : Block.LitAir;
-                        var lef = x - 1 > 0 ? chunk.Blocks[x - 1, y, z] : Block.LitAir;
-                        var rig = x + 1 < Chunk.Dimensions.X ? chunk.Blocks[x + 1, y, z] : Block.LitAir;
+
+                        var top = chunk.GetBlock(x, y + 1, z) ?? Block.LitAir;
+                        var bot = chunk.GetBlock(x, y - 1, z) ?? Block.UnlitAir;
+                        var fro = chunk.GetBlock(x, y, z - 1) ?? Block.LitAir;
+                        var bac = chunk.GetBlock(x, y, z + 1) ?? Block.LitAir;
+                        var lef = chunk.GetBlock(x - 1, y, z) ?? Block.LitAir;
+                        var rig = chunk.GetBlock(x + 1, y, z) ?? Block.LitAir;
                         
                         // Top
                         if (!chunk.IsSolid(x, y + 1, z))
@@ -244,7 +244,5 @@ public class Mesh : IDisposable
         
         GL.DeleteVertexArray(VertexArrayObject);
         GL.DeleteBuffer(VertexBufferObject);
-        
-        // Console.WriteLine($"Disposed mesh VAO: {VertexArrayObject}.");
     }
 }

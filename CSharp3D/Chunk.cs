@@ -21,13 +21,13 @@ public class Chunk : IDisposable
 
     public Block[,,] Blocks { get; set; } = new Block[Dimensions.X, Dimensions.Y, Dimensions.Z];
 
-    public Mesh Mesh { get; private set; } = null!;
+    public Mesh? Mesh { get; private set; }
 
     public bool IsLoaded { get; private set; } = false;
     
     public AABB BoundingBox { get; }
     
-    public DateTimeOffset CreatedAt { get; private set; } = DateTimeOffset.Now;
+    public DateTimeOffset CreatedAt { get; } = DateTimeOffset.Now;
 
     private World _world;
 
@@ -63,35 +63,47 @@ public class Chunk : IDisposable
     
     public bool IsSolid(int x, int y, int z)
     {
-        if (y < 0 || y > Dimensions.Y - 1) return false;
+        var block = GetBlock(x, y, z);
+
+        if (block.HasValue)
+        {
+            return block.Value.Type != BlockType.Air;
+        }
+
+        return false;
+    }
+    
+    public Block? GetBlock(int x, int y, int z)
+    {
+        if (y < 0 || y > Dimensions.Y - 1) return null;
         
         if (x < 0)
         {
-            if (Left is null) return false;
-            return Left.IsSolid(x + Dimensions.X, y, z);
+            if (Left is null) return null;
+            return Left.GetBlock(x + Dimensions.X, y, z);
         }
 
         if (x >= Dimensions.X)
         {
-            if (Right is null) return false;
-            return Right.IsSolid(x - Dimensions.X, y, z);
+            if (Right is null) return null;
+            return Right.GetBlock(x - Dimensions.X, y, z);
         }
 
         if (z < 0)
         {
-            if (Back is null) return false;
-            return Back.IsSolid(x, y, z + Dimensions.Z);
+            if (Back is null) return null;
+            return Back.GetBlock(x, y, z + Dimensions.Z);
         }
 
         if (z >= Dimensions.Z)
         {
-            if (Front is null) return false;
-            return Front.IsSolid(x, y, z - Dimensions.Z);
+            if (Front is null) return null;
+            return Front.GetBlock(x, y, z - Dimensions.Z);
         }
         
         var block = Blocks[x, y, z];
 
-        return block.Type != BlockType.Air;
+        return block;
     }
 
     public int HeightAt(int x, int z)
