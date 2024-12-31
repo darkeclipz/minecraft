@@ -25,6 +25,10 @@ public enum BlockType : byte
     DiamondOre = 20,
     BigPlantTop = 21,
     BigPlantBottom = 22,
+    GoldOre = 23,
+    RedStoneOre = 24,
+    EmeraldOre = 25,
+    LapusLazuliOre = 26,
 }
 
 public partial struct Block

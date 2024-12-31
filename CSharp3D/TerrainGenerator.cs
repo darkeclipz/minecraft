@@ -235,6 +235,84 @@ public static class TerrainGenerator
                 }
             }
             
+            // Gold ore
+            {
+                var rng = new Random(chunk.Position.GetHashCode());
+                
+                for (int x = 0; x < Chunk.Dimensions.X; x++)
+                for (int z = 0; z < Chunk.Dimensions.Z; z++)
+                for (int y = Chunk.Dimensions.Y - 2; y >= 0; y--)
+                {
+                    if (chunk.Blocks[x, y, z].Type == BlockType.Stone)
+                    {
+                        var p = rng.NextDouble();
+                        var c = Math.Clamp((140.0 - y) / 60.0, 0.0, 1.0);
+
+                        if (p < 0.0009 * c)
+                        {
+                            chunk.Blocks[x, y, z].Type = BlockType.GoldOre;
+                            var blockRef = chunk.GetBlockRef(x, y, z);
+
+                            var frontier = new Queue<BlockRef>();
+                            frontier.Enqueue(blockRef);
+
+                            while (frontier.TryDequeue(out var currentBlockRef))
+                            {
+                                currentBlockRef.SetBlockType(BlockType.GoldOre);
+                                var neighbours = blockRef.GetNeighbours9X9();
+
+                                foreach (var neighbour in neighbours)
+                                {
+                                    if (neighbour.Block.Type == BlockType.Stone && rng.NextDouble() < 0.065)
+                                    {
+                                        frontier.Enqueue(neighbour);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Redstone
+            {
+                var rng = new Random(chunk.Position.GetHashCode());
+                
+                for (int x = 0; x < Chunk.Dimensions.X; x++)
+                for (int z = 0; z < Chunk.Dimensions.Z; z++)
+                for (int y = Chunk.Dimensions.Y - 2; y >= 0; y--)
+                {
+                    if (chunk.Blocks[x, y, z].Type == BlockType.Stone)
+                    {
+                        var p = rng.NextDouble();
+                        var c = Math.Clamp((100.0 - y) / 60.0, 0.0, 1.0);
+
+                        if (p < 0.0007 * c)
+                        {
+                            chunk.Blocks[x, y, z].Type = BlockType.RedStoneOre;
+                            var blockRef = chunk.GetBlockRef(x, y, z);
+
+                            var frontier = new Queue<BlockRef>();
+                            frontier.Enqueue(blockRef);
+
+                            while (frontier.TryDequeue(out var currentBlockRef))
+                            {
+                                currentBlockRef.SetBlockType(BlockType.RedStoneOre);
+                                var neighbours = blockRef.GetNeighbours9X9();
+
+                                foreach (var neighbour in neighbours)
+                                {
+                                    if (neighbour.Block.Type == BlockType.Stone && rng.NextDouble() < 0.095)
+                                    {
+                                        frontier.Enqueue(neighbour);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
             // Diamond
             {
                 var rng = new Random(chunk.Position.GetHashCode());
@@ -264,6 +342,84 @@ public static class TerrainGenerator
                                 foreach (var neighbour in neighbours)
                                 {
                                     if (neighbour.Block.Type == BlockType.Stone && rng.NextDouble() < 0.045)
+                                    {
+                                        frontier.Enqueue(neighbour);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Lapus
+            {
+                var rng = new Random(chunk.Position.GetHashCode());
+                
+                for (int x = 0; x < Chunk.Dimensions.X; x++)
+                for (int z = 0; z < Chunk.Dimensions.Z; z++)
+                for (int y = Chunk.Dimensions.Y - 2; y >= 0; y--)
+                {
+                    if (chunk.Blocks[x, y, z].Type == BlockType.Stone)
+                    {
+                        var p = rng.NextDouble();
+                        var c = Math.Clamp((75.0 - y) / 75.0, 0.0, 1.0);
+
+                        if (p < 0.0007 * c)
+                        {
+                            chunk.Blocks[x, y, z].Type = BlockType.LapusLazuliOre;
+                            var blockRef = chunk.GetBlockRef(x, y, z);
+
+                            var frontier = new Queue<BlockRef>();
+                            frontier.Enqueue(blockRef);
+
+                            while (frontier.TryDequeue(out var currentBlockRef))
+                            {
+                                currentBlockRef.SetBlockType(BlockType.LapusLazuliOre);
+                                var neighbours = blockRef.GetNeighbours9X9();
+
+                                foreach (var neighbour in neighbours)
+                                {
+                                    if (neighbour.Block.Type == BlockType.Stone && rng.NextDouble() < 0.075)
+                                    {
+                                        frontier.Enqueue(neighbour);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Emerald ore
+            {
+                var rng = new Random(chunk.Position.GetHashCode());
+                
+                for (int x = 0; x < Chunk.Dimensions.X; x++)
+                for (int z = 0; z < Chunk.Dimensions.Z; z++)
+                for (int y = Chunk.Dimensions.Y - 2; y >= 0; y--)
+                {
+                    if (chunk.Blocks[x, y, z].Type == BlockType.Stone)
+                    {
+                        var p = rng.NextDouble();
+                        var c = Math.Clamp(x / 150.0, 0.0, 1.0);
+
+                        if (p < 0.00155 * c)
+                        {
+                            chunk.Blocks[x, y, z].Type = BlockType.EmeraldOre;
+                            var blockRef = chunk.GetBlockRef(x, y, z);
+
+                            var frontier = new Queue<BlockRef>();
+                            frontier.Enqueue(blockRef);
+
+                            while (frontier.TryDequeue(out var currentBlockRef))
+                            {
+                                currentBlockRef.SetBlockType(BlockType.EmeraldOre);
+                                var neighbours = blockRef.GetNeighbours9X9();
+
+                                foreach (var neighbour in neighbours)
+                                {
+                                    if (neighbour.Block.Type == BlockType.Stone && rng.NextDouble() < 0.015)
                                     {
                                         frontier.Enqueue(neighbour);
                                     }

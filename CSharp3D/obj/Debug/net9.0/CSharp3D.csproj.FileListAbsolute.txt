@@ -1,7 +1,6 @@
 C:\Users\Darky\Documents\Repos\CSharp3D\CSharp3D\bin\Debug\net9.0\CSharp3D.exe
 C:\Users\Darky\Documents\Repos\CSharp3D\CSharp3D\bin\Debug\net9.0\Shaders\shader.frag
 C:\Users\Darky\Documents\Repos\CSharp3D\CSharp3D\bin\Debug\net9.0\Shaders\shader.vert
-C:\Users\Darky\Documents\Repos\CSharp3D\CSharp3D\bin\Debug\net9.0\Textures\wall.jpg
 C:\Users\Darky\Documents\Repos\CSharp3D\CSharp3D\bin\Debug\net9.0\CSharp3D.deps.json
 C:\Users\Darky\Documents\Repos\CSharp3D\CSharp3D\bin\Debug\net9.0\CSharp3D.runtimeconfig.json
 C:\Users\Darky\Documents\Repos\CSharp3D\CSharp3D\bin\Debug\net9.0\CSharp3D.dll
@@ -51,3 +50,4 @@ C:\Users\Darky\Documents\Repos\CSharp3D\CSharp3D\bin\Debug\net9.0\Microsoft.Exte
 C:\Users\Darky\Documents\Repos\CSharp3D\CSharp3D\bin\Debug\net9.0\Microsoft.Extensions.FileSystemGlobbing.dll
 C:\Users\Darky\Documents\Repos\CSharp3D\CSharp3D\bin\Debug\net9.0\Microsoft.Extensions.Primitives.dll
 C:\Users\Darky\Documents\Repos\CSharp3D\CSharp3D\bin\Debug\net9.0\appsettings.json
+C:\Users\Darky\Documents\Repos\CSharp3D\CSharp3D\obj\Debug\net9.0\CSharp3D.sourcelink.json
